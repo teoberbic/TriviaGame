@@ -16,7 +16,7 @@ import com.mycompany.normaljavaclasses.Player;
  *
  * @author teoberbic
  */
-public abstract class UserInterface implements Screen {
+public abstract class UserInterface {
     protected Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;
     protected Skin skinUI;
     protected Player player1;

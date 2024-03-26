@@ -35,5 +35,5 @@ public class Drop extends Game{
 		batch.dispose();
 	}
         
-        Test t = new Test();
+       
 }

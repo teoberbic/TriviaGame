@@ -1,5 +1,6 @@
 package com.mycompany.javafinal;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
@@ -17,6 +18,7 @@ public class DesktopLauncher {
         config.setForegroundFPS(60);
         config.setTitle("Teo's Trivia Game");
         new Lwjgl3Application(new Drop(), config);
-        //Player p = new Player();
+        
     }
+
 }

@@ -61,7 +61,6 @@ public class MainMenuScreen implements Screen{
     }
     @Override
     public void show() {
-        
         // All assets are in a new class for encapsualtion then call the loadCategoryPickerScreen method so they get loaded
         assets = new Assets(stage);
         assets.loadMainMenuScreen();
@@ -70,17 +69,17 @@ public class MainMenuScreen implements Screen{
         imageButton = assets.getImageButton();
         
         // Camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1500, 750);
+        //camera = new OrthographicCamera();
+        //camera.setToOrtho(false, WIDTH, HEIGHT);
 
         Gdx.input.setInputProcessor(stage); // set the stage for input to be processed through
         
-        // Button Clicked Handler
+        // Button Clicked Handler (has to be in show method)
         imageButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 
-                game.setScreen(new CategoryPickerScreen(game));
+                game.setScreen(new CategoryPickerScreen(game)); // Once clicked change screen to  CategoryPickerScreen to advance game
                 dispose();
             }
         });
@@ -91,8 +90,8 @@ public class MainMenuScreen implements Screen{
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 0);
 
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
+        //camera.update();
+        //game.batch.setProjectionMatrix(camera.combined);
 
         stage.act();
         stage.draw();

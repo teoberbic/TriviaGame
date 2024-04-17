@@ -6,6 +6,7 @@ package com.mycompany.javafinal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -20,8 +22,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import static com.mycompany.javafinal.Drop.HEIGHT;
 import static com.mycompany.javafinal.Drop.WIDTH;
 import com.mycompany.normaljavaclasses.Player;
+import com.mycompany.normaljavaclasses.Question;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  *
@@ -30,7 +34,7 @@ import java.util.List;
 public class Assets {
     Stage stage;
     // MainMenuScreen
-    private Music backgroundMusic;
+    private Music menuBackgroundMusic;
     private Texture backgroundImageTexture;
     private Image backgroundImage;
     private Label welcomeTextLabel;
@@ -39,6 +43,7 @@ public class Assets {
     private ImageButton imageButton;
     private Label.LabelStyle bigLabelStyle;
     // CategoryPickerScreen
+    private boolean player1EnteredName;
     private Image arrowImage;
     private Image wheel;
     private Image player1NameTagImage = new Image(new Texture(Gdx.files.internal("playerName.png")));;
@@ -80,6 +85,41 @@ public class Assets {
     private ImageButton[] imageButtons = {imageButton, imageButton2, imageButton3, imageButton4};
     private Image scoreIcon;
     private Image scoreIcon2;
+    private Label errorEnterNameLabel;
+    private Sound correctAnswerSFX;
+    
+    // should only be static if all classes have field
+    public static Label errorNameTooLongLabel;
+    private Sound incorrectAnswerSFX;
+    private Sound wheelSpinSFX;
+    private Sound enterSFX;
+    private Sound enterErrorSFX;
+    private Sound categoryAppearSFX;
+    private Sound clockTickingSFX;
+    private Label nameLabelNote;
+    
+    //EndGameScreen
+    private Image winnerBanner;
+    private ImageButton replayButton;
+    private Texture replayButtonTexture;
+    private Image correctAnswerImage;
+    private Image incorrectAnswerImage;
+    private Label player1GainedPointLabel;
+    private Label player2GainedPointLabel;
+    private Music gameBackgroundMusic;
+    private Label player1TurnLabel;
+    private Label player2TurnLabel;
+    private List<Question> player1Questions;
+    private List<Question> player2Questions;
+    private ArrayList<Label> playerQLabels;
+    private Skin skinUI2;
+    private ArrayList<Label> playerAnsLabels;
+    private Label winnerLabel;
+    private Label player1QsANDAsLabel;
+    private Label player2QsANDAsLabel;
+    private Music endGameCheer;
+    private Label spaceLabel;
+    private Skin skinUI3;
     
     // Constructor for MainMenuScreen & CategoryPickerScreen
     public Assets(Stage stage) {
@@ -101,15 +141,23 @@ public class Assets {
         this.player2CategoryLabel = player2CategoryLabel;
     }
     
-    
+    // Constructor for EndGameScreen 
+    public Assets(Stage stage, Player player1, Player player2, List<Question> player1Questions, List<Question> player2Questions) {
+        this.stage = stage;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.player1Questions = player1Questions;
+        this.player2Questions = player2Questions;
+        
+    }
     /////////////////////////
     //Load Main Menu Screen//
     /////////////////////////
     public void loadMainMenuScreen() {
         // Music
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("menuMusic.mp3"));
-        backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.5f);
+        menuBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("menuMusic.mp3"));
+        menuBackgroundMusic.setLooping(true);
+        menuBackgroundMusic.setVolume(0.5f);
         
         //Background Image
         backgroundImageTexture = new Texture(Gdx.files.internal("background.jpeg"));
@@ -142,7 +190,7 @@ public class Assets {
     
     // Getters for MainMenuScreen
     public Music getBackgroundMusic() {
-        return this.backgroundMusic;
+        return this.menuBackgroundMusic;
     }
     
     public ImageButton getImageButton() {
@@ -154,10 +202,11 @@ public class Assets {
     //Load Category Picker Screen//
     //////////////////////////////
     public void loadCategoryPickerScreen() {
+        //player1EnteredName = false;
         // Wheel
         wheel = new Image(new Texture(Gdx.files.internal("wheel3.png")));
-        wheel.setOrigin(wheel.getWidth() / 2, wheel.getHeight() / 2); // sets the center of image as the origin so it spins from the center
-        wheel.setPosition(Gdx.graphics.getWidth() / 2 - wheel.getWidth() / 2, Gdx.graphics.getHeight() / 2 - wheel.getHeight() / 2); // where the image is on the sreen
+        wheel.setOrigin(wheel.getWidth()/2, wheel.getHeight()/2); // sets the center of image as the origin so it spins from the center
+        wheel.setPosition(WIDTH/2 - wheel.getWidth()/2, Gdx.graphics.getHeight()/2 - wheel.getHeight()/2); // where the image is on the sreen
         stage.addActor(wheel);
         wheel.setVisible(false);
         
@@ -182,7 +231,7 @@ public class Assets {
         player2CategoryTagImage.setVisible(false);
         
         arrowImage = new Image(new Texture(Gdx.files.internal("arrow.png")));
-        arrowImage.setPosition(WIDTH/2 - arrowImage.getWidth()/2, HEIGHT - 50 - arrowImage.getHeight()/2);
+        arrowImage.setPosition(WIDTH/2 - arrowImage.getWidth()/2 - 7, HEIGHT - 50 - arrowImage.getHeight()/2);
         stage.addActor(arrowImage);
         
          // Players Icon Image's
@@ -212,20 +261,24 @@ public class Assets {
         stage.addActor(tableUI);
 
         skinUI = new Skin(Gdx.files.internal("glassy-ui.json"));
-        Label.LabelStyle bigLabelStyle = skinUI.get("big", Label.LabelStyle.class);
-        bigLabelStyle.fontColor = Color.WHITE;
+        Label.LabelStyle bigLabelStyleWhite = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleWhite.fontColor = Color.WHITE;
+        skinUI.getFont("font-big").getData().setScale(.41f);
+        
+        Label.LabelStyle bigLabelStyleRed = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleRed.fontColor = Color.RED;
         skinUI.getFont("font-big").getData().setScale(.41f);
 
-        nameLabelUI = new Label("Player 1 Enter Name: ", bigLabelStyle);
+        nameLabelUI = new Label("Player 1 Enter Name: ", bigLabelStyleWhite);
         nameFieldUI = new TextField("", skinUI);
         tableUI.add(nameLabelUI);
         tableUI.add(nameFieldUI).width(150);
 
-        player1NameLabel = new Label("Player 1 Name: ", bigLabelStyle);
+        player1NameLabel = new Label("Player 1 Name: ", bigLabelStyleWhite);
         player1NameLabel.setPosition(120, HEIGHT -50);
         stage.addActor(player1NameLabel);
         player1NameLabel.setVisible(false);
-        player1CategoryLabel = new Label("Player 1 Category: ", bigLabelStyle);
+        player1CategoryLabel = new Label("Player 1 Category: ", bigLabelStyleWhite);
         player1CategoryLabel.setPosition(120, HEIGHT -145);
         stage.addActor(player1CategoryLabel);
         player1CategoryLabel.setVisible(false);
@@ -235,29 +288,58 @@ public class Assets {
         tableUI2.setFillParent(true);
         stage.addActor(tableUI2);
 
-        nameLabelUI2 = new Label("Player 2 Enter Name: ", skinUI); //label to the left
+        nameLabelUI2 = new Label("Player 2 Enter Name: ", bigLabelStyleWhite); //label to the left
         nameLabelUI2.setVisible(false);
         nameFieldUI2 = new TextField("", skinUI); //field to capture name
         nameFieldUI2.setVisible(false);
         tableUI2.add(nameLabelUI2);
         tableUI2.add(nameFieldUI2).width(150);
 
-        player2NameLabel = new Label("Player 2 Name: ", bigLabelStyle);
+        player2NameLabel = new Label("Player 2 Name: ", bigLabelStyleWhite);
         player2NameLabel.setPosition(WIDTH - 280, HEIGHT -50);
         stage.addActor(player2NameLabel);
         player2NameLabel.setVisible(false);
-        player2CategoryLabel = new Label("Player 2 Category: ", bigLabelStyle);
+        player2CategoryLabel = new Label("Player 2 Category: ", bigLabelStyleWhite);
         player2CategoryLabel.setPosition(WIDTH-280, HEIGHT -145);
         stage.addActor(player2CategoryLabel);
         player2CategoryLabel.setVisible(false);
         
-        // Timer
-        timerLabel = new Label("Countdown Until Game Start: " + countdownTime, bigLabelStyle);
+        // Timer + Timer Vars
+        timerLabel = new Label("Countdown Until Game Start: " + countdownTime, bigLabelStyleWhite);
         timerLabel.setPosition(WIDTH/2 - 200, HEIGHT/2);
         stage.addActor(timerLabel);
         timerLabel.setVisible(false);
         
+        // Error Handling
+        nameLabelNote = new Label("Note: Name can only be\n   up to six characters\n\n      Hint: Be creative", bigLabelStyleRed);
+        nameLabelNote.setPosition(WIDTH/2 - 100, HEIGHT/2 + 100);
+        stage.addActor(nameLabelNote);
+        nameLabelNote.setVisible(true);
+        
+        errorEnterNameLabel = new Label("Please Enter a Name", bigLabelStyleRed);
+        errorEnterNameLabel.setPosition(WIDTH/2 - 100, HEIGHT/2 - 100);
+        stage.addActor(errorEnterNameLabel);
+        errorEnterNameLabel.setVisible(false);
+        
+        errorNameTooLongLabel = new Label("Name is too long", bigLabelStyleRed);
+        errorNameTooLongLabel.setPosition(WIDTH/2 - 100, HEIGHT/2 - 100);
+        stage.addActor(errorNameTooLongLabel);
+        errorNameTooLongLabel.setVisible(false);
+        
+        // Sound Effects
+        wheelSpinSFX = Gdx.audio.newSound(Gdx.files.internal("wheelSpinSFX.mp3"));
+        enterSFX = Gdx.audio.newSound(Gdx.files.internal("enterSFX.mp3"));
+        enterErrorSFX = Gdx.audio.newSound(Gdx.files.internal("enterErrorSFX.mp3"));
+        categoryAppearSFX = Gdx.audio.newSound(Gdx.files.internal("categoryAppearSFX.mp3"));
+        clockTickingSFX = Gdx.audio.newSound(Gdx.files.internal("clockTickingSFX.mp3"));
+        
+        // Press Space
+        spaceLabel = new Label("PRESS SPACE TO SPIN" , bigLabelStyleWhite);
+        spaceLabel.setPosition(WIDTH/2 - spaceLabel.getWidth()/2, 10);
+        stage.addActor(spaceLabel);
+        spaceLabel.setVisible(false);
     }
+    
     
     // Getters for CategoryPickerScreen
     public Image getWheel() {
@@ -332,7 +414,41 @@ public class Assets {
         return this.timerLabel;
     }
     
+    public Label getErrorEnterNameLabel() {
+        return errorEnterNameLabel;
+    }
     
+    public Sound getWheelSpinSFX() {
+        return this.wheelSpinSFX;
+    }
+    
+    public Sound getEnterSFX() {
+        return this.enterSFX;
+    }
+    
+    public Sound getEnterErrorSFX() {
+        return this.enterErrorSFX;
+    }
+    
+    public Sound getCategoryAppearSFX() {
+        return this.categoryAppearSFX;
+    }
+    
+    public Sound getClockTickingSFX() {
+        return this.clockTickingSFX;
+    }
+    
+    public Label getNameLabelNote() {
+        return this.nameLabelNote;
+    }
+    
+    public boolean getPlayer1EnteredName() {
+        return this.player1EnteredName;
+    }
+    
+    public Label getSpaceLabel() {
+        return this.spaceLabel;
+    }
     ////////////////////
     //Load Game Screen//
     ////////////////////
@@ -354,34 +470,42 @@ public class Assets {
         stage.addActor(player2CategoryTagImage);
         
         // Skin
-        skinUI = new Skin(Gdx.files.internal("uiskin.json"));
-        skinUI.getFont("default-font").getData().setScale(2.0f);
         skinUI = new Skin(Gdx.files.internal("glassy-ui.json"));
-        Label.LabelStyle bigLabelStyle = skinUI.get("big", Label.LabelStyle.class);
-        bigLabelStyle.fontColor = Color.WHITE;
+        Label.LabelStyle bigLabelStyleBlack = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleBlack.fontColor = Color.BLACK;
         skinUI.getFont("font-big").getData().setScale(.41f);
         
-        // Players Name Labels
+        Label.LabelStyle bigLabelStyleWhite = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleWhite.fontColor = Color.WHITE;
+       
+        skinUI2 = new Skin(Gdx.files.internal("glassy-ui.json"));
+        Label.LabelStyle extraBigLabelStyleWhite = new Label.LabelStyle(skinUI2.get("big", Label.LabelStyle.class));
+        extraBigLabelStyleWhite.fontColor = Color.WHITE;
+        skinUI2.getFont("font-big").getData().setScale(.60f);
         
-        //player1NameLabel = new Label("Player 1 Name: ", bigLabelStyle);
+        Label.LabelStyle extraBigLabelStyleGreen = new Label.LabelStyle(skinUI2.get("big", Label.LabelStyle.class));
+        extraBigLabelStyleGreen.fontColor = Color.GREEN;
+        
+        // Players Name Labels
+        //player1NameLabel = new Label("Player 1 Name: ", bigLabelStyleWhite);
         player1NameLabel.setPosition(120, HEIGHT -50);
-        //player2NameLabel = new Label("Player 2 Name: ", bigLabelStyle);
+        //player2NameLabel = new Label("Player 2 Name: ", bigLabelStyleWhite);
         player2NameLabel.setPosition(WIDTH - 280, HEIGHT -50);
         stage.addActor(player1NameLabel); 
         stage.addActor(player2NameLabel);
         
         // Players Category Labels
-        
-        //player1CategoryLabel = new Label("Player 1 Category: ", bigLabelStyle);
+        //player1CategoryLabel = new Label("Player 1 Category: ", bigLabelStyleWhite);
         player1CategoryLabel.setPosition(120, HEIGHT -145);
-        //player2CategoryLabel = new Label("Player 2 Category: ", bigLabelStyle);
+        //player2CategoryLabel = new Label("Player 2 Category: ", bigLabelStyleWhite);
         player2CategoryLabel.setPosition(WIDTH-280, HEIGHT -145);
         stage.addActor(player1CategoryLabel);
         stage.addActor(player2CategoryLabel);
         
         // Timer
-        timerLabel = new Label("Time: " + timer, bigLabelStyle);
-        timerLabel.setPosition(WIDTH/2 - 50, HEIGHT/2);
+        skinUI.getFont("font-big").getData().setScale(.75f);
+        timerLabel = new Label("Time: " + timer, extraBigLabelStyleWhite);
+        timerLabel.setPosition(WIDTH/2 - timerLabel.getWidth()/2, HEIGHT/2 + 100);
         stage.addActor(timerLabel);
         
         // Question Label Tag
@@ -390,30 +514,31 @@ public class Assets {
         stage.addActor(questionLabelImage);
         
         // Question Label
-        questionLabel = new Label("", bigLabelStyle);
-        questionLabel.setPosition(WIDTH/2 -200, HEIGHT/2 + 300);
+        skinUI.getFont("font-big").getData().setScale(.41f);
+        questionLabel = new Label("", bigLabelStyleBlack);
+        questionLabel.setPosition(WIDTH/2 -230, HEIGHT/2 + 250);
         stage.addActor(questionLabel);
         
         // Create an Image Buttons (create a function)
         imageButtons = new ImageButton[] {
-        imageButton = createImageButton("1", 50, HEIGHT/2 - 200),
-        imageButton2 = createImageButton("2", 50,50),
-        imageButton3 = createImageButton("3", WIDTH - 50 - 300,HEIGHT/2 - 200),
-        imageButton4 = createImageButton("4", WIDTH - 50 - 300,50)};
+        imageButton = createImageButtonQuestion("1", 50, HEIGHT/2 - 200),
+        imageButton2 = createImageButtonQuestion("2", 50,50),
+        imageButton3 = createImageButtonQuestion("3", WIDTH - 50 - 300,HEIGHT/2 - 200),
+        imageButton4 = createImageButtonQuestion("4", WIDTH - 50 - 300,50)};
         
-        // Answer Labels 
+        // Answer Labels
         for (int i = 1; i <= 4; i++) {
-            answerLabels.add(new Label("", bigLabelStyle));
+            answerLabels.add(new Label("", bigLabelStyleBlack));
         }
         
         stage.addActor(answerLabels.get(0));
         stage.addActor(answerLabels.get(1));
         stage.addActor(answerLabels.get(2));
         stage.addActor(answerLabels.get(3));
-        answerLabels.get(0).setPosition(imageButton.getX() + 10, imageButton.getY() + 30);
-        answerLabels.get(1).setPosition(imageButton2.getX() + 10, imageButton2.getY() + 30);
-        answerLabels.get(2).setPosition(imageButton3.getX() + 10, imageButton3.getY() + 30);
-        answerLabels.get(3).setPosition(imageButton4.getX() + 10, imageButton4.getY() + 30);
+        answerLabels.get(0).setPosition(imageButton.getX() + 10, imageButton.getY() + 75);
+        answerLabels.get(1).setPosition(imageButton2.getX() + 10, imageButton2.getY() + 75);
+        answerLabels.get(2).setPosition(imageButton3.getX() + 10, imageButton3.getY() + 75);
+        answerLabels.get(3).setPosition(imageButton4.getX() + 10, imageButton4.getY() + 75);
         
         // Players Name Image Tag's
         player1ScoreTagImage = new Image(new Texture(Gdx.files.internal("playerScore.png")));
@@ -424,9 +549,9 @@ public class Assets {
         stage.addActor(player2ScoreTagImage);
         
         // Score Labels
-        player1ScoreLabel = new Label("Player 1 Score: " + player1.getScore(), bigLabelStyle);
+        player1ScoreLabel = new Label("Player 1 Score: " + player1.getScore(), bigLabelStyleWhite);
         player1ScoreLabel.setPosition(120, HEIGHT -235);
-        player2ScoreLabel = new Label("Player  2 Score: " + player2.getScore(), bigLabelStyle);
+        player2ScoreLabel = new Label("Player 2 Score: " + player2.getScore(), bigLabelStyleWhite);
         player2ScoreLabel.setPosition(WIDTH-280, HEIGHT -235);
         stage.addActor(player1ScoreLabel);
         stage.addActor(player2ScoreLabel);
@@ -456,11 +581,52 @@ public class Assets {
         scoreIcon2 = new Image(new Texture(Gdx.files.internal("score.png")));
         scoreIcon2.setPosition(WIDTH - player2IconImage.getWidth() - player2CategoryTagImage.getWidth() +60,HEIGHT - player2IconImage.getHeight() - 190);
         stage.addActor(scoreIcon2);
+        
+        // Sound Effects
+        correctAnswerSFX = Gdx.audio.newSound(Gdx.files.internal("correctAnswer.mp3"));
+        incorrectAnswerSFX = Gdx.audio.newSound(Gdx.files.internal("incorrectAnswer.mp3"));
+        
+        // Correct Answer Image
+        correctAnswerImage = new Image(new Texture(Gdx.files.internal("correctAnswer.png")));
+        correctAnswerImage.setPosition(WIDTH/2 - correctAnswerImage.getWidth()/2, HEIGHT/2 - 350);
+        stage.addActor(correctAnswerImage);
+        correctAnswerImage.setVisible(false);
+        
+        // Correct Answer Image
+        incorrectAnswerImage = new Image(new Texture(Gdx.files.internal("incorrectAnswer.png")));
+        incorrectAnswerImage.setPosition(WIDTH/2 - incorrectAnswerImage.getWidth()/2, HEIGHT/2 - 350);
+        stage.addActor(incorrectAnswerImage);
+        incorrectAnswerImage.setVisible(false);
+        
+        // Player Gained Point Label
+        player1GainedPointLabel = new Label(player1.getName() + " Score: + 1" , extraBigLabelStyleGreen);
+        player1GainedPointLabel.setPosition(WIDTH/2 - player1GainedPointLabel.getWidth()/2, HEIGHT/2);
+        player2GainedPointLabel = new Label(player2.getName() + "  Score: + 1", extraBigLabelStyleGreen);
+        player2GainedPointLabel.setPosition(WIDTH/2 -player2GainedPointLabel.getWidth()/2, HEIGHT/2);
+        stage.addActor(player1GainedPointLabel);
+        stage.addActor(player2GainedPointLabel);
+        player1GainedPointLabel.setVisible(false);
+        player2GainedPointLabel.setVisible(false);
+
+        // Background Music
+        gameBackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("gameBackgroundMusic.mp3"));
+        gameBackgroundMusic.setLooping(true);
+        gameBackgroundMusic.setVolume(1f);
+        
+        // Turn Label
+        player1TurnLabel = new Label(player1.getName() + "'s Turn", extraBigLabelStyleWhite);
+        player1TurnLabel.setPosition(WIDTH/2 - player1TurnLabel.getWidth()/2, HEIGHT/2 -60);
+        player2TurnLabel = new Label(player2.getName() + "'s Turn", extraBigLabelStyleWhite);
+        player2TurnLabel.setPosition(WIDTH/2 - player2TurnLabel.getWidth()/2, HEIGHT/2 -60);
+        stage.addActor(player1TurnLabel);
+        stage.addActor(player2TurnLabel);
+        player1TurnLabel.setVisible(false);
+        player2TurnLabel.setVisible(false);
     }
     
     
     // Fn for Game Screen
-    public ImageButton createImageButton(String num, int x, int y) {
+    public ImageButton createImageButtonQuestion(String num, int x, int y) {
         
         Texture answerBtnTexture = new Texture(Gdx.files.internal("btnImage" + num + ".png"));
         Texture answerBtnTextureHover = new Texture(Gdx.files.internal("btnImage" + num + "Hover.png"));
@@ -499,5 +665,215 @@ public class Assets {
     
     public Label getCurrentPlayerScoreLabel() {
         return this.currentPlayerScoreLabel;
+    }
+    
+    public Sound getCorrectAnswerSFX() {
+        return this.correctAnswerSFX;
+    }
+    
+    public Sound getIncorrectAnswerSFX() {
+        return this.incorrectAnswerSFX;
+    }
+    
+    public Image getCorrectAnswerImage() {
+        return this.correctAnswerImage;
+    }
+    
+    public Image getIncorrectAnswerImage() {
+        return this.incorrectAnswerImage;
+    }
+    
+    public Label getPlayer1GainedPointLabel() {
+        return this.player1GainedPointLabel;
+    }
+    
+    public Label getPlayer2GainedPointLabel() {
+        return this.player2GainedPointLabel;
+    }
+    
+    public Music getGameBackgroundMusic() {
+        return this.gameBackgroundMusic;
+    }
+    
+    public Label getPlayer1TurnLabel() {
+        return this.player1TurnLabel;
+    }
+    
+    public Label getPlayer2TurnLabel() {
+        return this.player2TurnLabel;
+    }
+    ///////////////////////
+    //Load EndGame Screen//
+    ///////////////////////
+    
+    public void loadEndGameScreen() {
+      
+        // Skin
+        skinUI = new Skin(Gdx.files.internal("glassy-ui.json"));
+        Label.LabelStyle bigLabelStyleWhite = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleWhite.fontColor = Color.WHITE;
+        skinUI.getFont("font-big").getData().setScale(.41f);
+        
+        Label.LabelStyle bigLabelStyleGreen = new Label.LabelStyle(skinUI.get("big", Label.LabelStyle.class));
+        bigLabelStyleGreen.fontColor = Color.GREEN;
+        skinUI.getFont("font-big").getData().setScale(.41f);
+        
+        // Skin 2
+        skinUI2 = new Skin(Gdx.files.internal("glassy-ui.json"));
+        Label.LabelStyle labelStyleWhite = new Label.LabelStyle(skinUI2.get("default", Label.LabelStyle.class));
+        labelStyleWhite.fontColor = Color.WHITE;
+        skinUI2.getFont("font").getData().setScale(.75f);
+        
+        skinUI3 = new Skin(Gdx.files.internal("glassy-ui.json"));
+        Label.LabelStyle extraBigLabelStyleWhite = new Label.LabelStyle(skinUI3.get("big", Label.LabelStyle.class));
+        extraBigLabelStyleWhite.fontColor = Color.WHITE;
+        skinUI3.getFont("font-big").getData().setScale(.60f);
+        
+        Label.LabelStyle labelStyleGreen = new Label.LabelStyle(skinUI2.get("default", Label.LabelStyle.class));
+        labelStyleGreen.fontColor = Color.GREEN;
+        skinUI2.getFont("font").getData().setScale(.75f);
+        
+        // Players Category Tag's
+        player1CategoryTagImage = new Image(new Texture(Gdx.files.internal("categoryName.png")));
+        player1CategoryTagImage.setPosition(0,HEIGHT -105);
+        player2CategoryTagImage = new Image(new Texture(Gdx.files.internal("categoryName.png")));
+        player2CategoryTagImage.setPosition(WIDTH- player1CategoryTagImage.getWidth() - 50,HEIGHT- 105);
+        stage.addActor(player1CategoryTagImage);
+        stage.addActor(player2CategoryTagImage);
+        
+        // Players Category Labels
+        player1CategoryLabel = new Label("Player 1 Category: " +"\n" + player1.getCategory(), bigLabelStyleWhite);
+        player1CategoryLabel.setPosition(120, HEIGHT -75);
+        player2CategoryLabel = new Label("Player 2 Category: " +"\n" + player2.getCategory(), bigLabelStyleWhite);
+        player2CategoryLabel.setPosition(WIDTH - 280, HEIGHT -75);
+        stage.addActor(player1CategoryLabel);
+        stage.addActor(player2CategoryLabel);
+        
+        // Winner Banner
+        winnerBanner = new Image(new Texture(Gdx.files.internal("winnerBanner.png")));
+        winnerBanner.setPosition(WIDTH/2 - winnerBanner.getWidth()/2, HEIGHT - winnerBanner.getHeight());
+        stage.addActor(winnerBanner);
+        
+        // Winning Music
+        endGameCheer = Gdx.audio.newMusic(Gdx.files.internal("endGameCheer.mp3"));
+        endGameCheer.setLooping(true);
+        endGameCheer.setVolume(0.5f);
+        
+        // Winner Label
+        String winnerName = "";
+        if (player1.getScore() > player2.getScore()) {
+            winnerName = player1.getName();
+        } else {
+            winnerName = player2.getName();
+        }
+        winnerLabel = new Label("WINNER: " + winnerName, extraBigLabelStyleWhite);
+        winnerLabel.setPosition(WIDTH/2 - 75, HEIGHT - 50);
+        stage.addActor(winnerLabel);
+
+        // Player Qs and As Text Label
+        player1QsANDAsLabel = new Label(player1.getName() + "'s Questions & Correct Answers: ", bigLabelStyleWhite);
+        player1QsANDAsLabel.setPosition(5, HEIGHT/2 + 100);
+        stage.addActor(player1QsANDAsLabel);
+        
+        player2QsANDAsLabel = new Label(player2.getName() + "'s Questions & Correct Answers: ", bigLabelStyleWhite);
+        player2QsANDAsLabel.setPosition(WIDTH - 450, HEIGHT/2 + 100);
+        stage.addActor(player2QsANDAsLabel);
+        
+        // Score Labels
+        //player1ScoreLabel = new Label("Player 1 Score: " + player1.getScore(), bigLabelStyle);
+        player1ScoreLabel = new Label(player1.getName() + "'s  Score: " + player1.getScore(), bigLabelStyleWhite);
+        player1ScoreLabel.setPosition(WIDTH/2 - 75, HEIGHT/2 + 75);
+        player2ScoreLabel = new Label(player2.getName() + "'s Score: " + player2.getScore(), bigLabelStyleWhite);
+        player2ScoreLabel.setPosition(WIDTH/2 - 75, HEIGHT/2 + 125);
+        stage.addActor(player1ScoreLabel);
+        stage.addActor(player2ScoreLabel);
+        currentPlayerScoreLabel = player1ScoreLabel;
+                
+        // Replay Image Button
+        replayButtonTexture = new Texture(Gdx.files.internal("replayButton.png"));
+        ImageButton.ImageButtonStyle buttonStyle = new ImageButton.ImageButtonStyle();
+        buttonStyle.imageUp = new TextureRegionDrawable(new TextureRegion(replayButtonTexture)); // Set button image
+        replayButton = new ImageButton(buttonStyle);
+        replayButton.setPosition(WIDTH/2 - replayButton.getWidth()/2, HEIGHT/2 - 150);
+        stage.addActor(replayButton);
+        
+        // Player 1 Question Labels
+        
+        displayQsandAs(player1Questions, labelStyleWhite, labelStyleGreen);
+        displayQsandAs(player2Questions, labelStyleWhite, labelStyleGreen);
+        
+        
+    }
+    
+    public void displayQsandAs(List<Question> playerQuestions, Label.LabelStyle white, Label.LabelStyle green) {
+       
+        int x = 0;
+        
+        if (playerQuestions == player1Questions) {
+            x = 25;
+        } else {
+            x = WIDTH/2 + 250;
+        }
+        
+        
+        for (int i = 0; i < playerQuestions.size(); i++) {
+            Question currentQ = playerQuestions.get(i);
+            // if current question is too long do something similar as game screen
+            String currentQuestionString = currentQ.getQuestion();
+            if (currentQuestionString.length() > 60) {
+                currentQuestionString = adjustLabelWidth(currentQ.getQuestion(),60);
+            }
+            String currentA = currentQ.getCorrectAnswer();
+            Label currentQLabel = new Label(StringEscapeUtils.unescapeHtml4(currentQuestionString), white);
+            Label currentALabel = new Label(StringEscapeUtils.unescapeHtml4(currentA), green);
+           
+            stage.addActor(currentQLabel);
+            if (currentQuestionString.length() > 60) {
+               currentQLabel.setPosition(x, (HEIGHT/2 + 50) - i * 40);
+               currentALabel.setPosition(x, ((HEIGHT/2 + 30) - i * 40));
+               stage.addActor(currentALabel);
+            } else if (currentQuestionString.length() > 100) {
+               currentQLabel.setPosition(x, (HEIGHT/2 + 0) - i * 40);
+               currentALabel.setPosition(x, ((HEIGHT/2 - 20) - i * 40));
+               stage.addActor(currentALabel);
+            } else {
+                currentQLabel.setPosition(x, (HEIGHT/2 + 60) - i * 40); // 60 was good 
+                stage.addActor(currentALabel);
+                currentALabel.setPosition(x, ((HEIGHT/2 + 40) - i * 40)); // 40 was good
+            }
+        }
+    }
+    
+    public String adjustLabelWidth(String text, int lengthCap) {
+        
+        StringBuilder stringbuilder = new StringBuilder();
+        
+        while (text.length() > lengthCap) {
+            String currentSubString = text.substring(0, lengthCap + 1); // substring == "Hi my name "
+
+            int lastIDXofSpace = currentSubString.lastIndexOf(" ");
+
+            currentSubString = currentSubString.substring(0, lastIDXofSpace) + "\n";
+
+            stringbuilder.append(currentSubString);
+
+            text = text.substring(lastIDXofSpace + 1);
+
+            if (text.length() < lengthCap ) {
+                stringbuilder.append(text);
+            }
+        }
+        
+        text = "\n" +  "\n" + stringbuilder.toString();
+           
+        return text;
+    }
+    
+    public ImageButton getReplayButton() {
+        return this.replayButton;
+    }
+    
+    public Music getEndGameCheer() {
+        return this.endGameCheer;
     }
 }

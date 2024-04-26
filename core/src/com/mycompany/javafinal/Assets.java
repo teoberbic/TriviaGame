@@ -120,6 +120,8 @@ public class Assets {
     private Music endGameCheer;
     private Label spaceLabel;
     private Skin skinUI3;
+    private Label choosePlayer1Label;
+    private Label revealPlayer1Label;
     
     // Constructor for MainMenuScreen & CategoryPickerScreen
     public Assets(Stage stage) {
@@ -271,10 +273,11 @@ public class Assets {
 
         nameLabelUI = new Label("Player 1 Enter Name: ", bigLabelStyleWhite);
         nameFieldUI = new TextField("", skinUI);
+        nameFieldUI.setVisible(true);
         tableUI.add(nameLabelUI);
         tableUI.add(nameFieldUI).width(150);
 
-        player1NameLabel = new Label("Player 1 Name: ", bigLabelStyleWhite);
+        player1NameLabel = new Label("Player 1 Name :", bigLabelStyleWhite);
         player1NameLabel.setPosition(120, HEIGHT -50);
         stage.addActor(player1NameLabel);
         player1NameLabel.setVisible(false);
@@ -288,7 +291,7 @@ public class Assets {
         tableUI2.setFillParent(true);
         stage.addActor(tableUI2);
 
-        nameLabelUI2 = new Label("Player 2 Enter Name: ", bigLabelStyleWhite); //label to the left
+        nameLabelUI2 = new Label("Player 2 Enter Name:", bigLabelStyleWhite); //label to the left
         nameLabelUI2.setVisible(false);
         nameFieldUI2 = new TextField("", skinUI); //field to capture name
         nameFieldUI2.setVisible(false);
@@ -338,6 +341,17 @@ public class Assets {
         spaceLabel.setPosition(WIDTH/2 - spaceLabel.getWidth()/2, 10);
         stage.addActor(spaceLabel);
         spaceLabel.setVisible(false);
+        
+        // Loading Label
+        choosePlayer1Label = new Label("Any Player Pick Heads or Tails To Decide Who Will Go First", bigLabelStyleWhite);
+        choosePlayer1Label.setPosition(WIDTH/2 - choosePlayer1Label.getWidth()/2, HEIGHT/2);
+        stage.addActor(choosePlayer1Label);
+        choosePlayer1Label.setVisible(false);
+        
+        revealPlayer1Label = new Label("", bigLabelStyleWhite);
+        revealPlayer1Label.setPosition(15, HEIGHT - player1NameTagImage.getHeight() - player1CategoryTagImage.getHeight());
+        stage.addActor(revealPlayer1Label);
+        revealPlayer1Label.setVisible(false);
     }
     
     
@@ -448,6 +462,14 @@ public class Assets {
     
     public Label getSpaceLabel() {
         return this.spaceLabel;
+    }
+    
+    public Label getChoosePlayer1Label() {
+        return this.choosePlayer1Label;
+    }
+    
+    public Label getRevealPlayer1Label() {
+        return this.revealPlayer1Label;
     }
     ////////////////////
     //Load Game Screen//
@@ -614,9 +636,9 @@ public class Assets {
         gameBackgroundMusic.setVolume(1f);
         
         // Turn Label
-        player1TurnLabel = new Label(player1.getName() + "'s Turn", extraBigLabelStyleWhite);
+        player1TurnLabel = new Label(player1.getName().trim() + "'s Turn", extraBigLabelStyleWhite);
         player1TurnLabel.setPosition(WIDTH/2 - player1TurnLabel.getWidth()/2, HEIGHT/2 -60);
-        player2TurnLabel = new Label(player2.getName() + "'s Turn", extraBigLabelStyleWhite);
+        player2TurnLabel = new Label(player2.getName().trim() + "'s Turn", extraBigLabelStyleWhite);
         player2TurnLabel.setPosition(WIDTH/2 - player2TurnLabel.getWidth()/2, HEIGHT/2 -60);
         stage.addActor(player1TurnLabel);
         stage.addActor(player2TurnLabel);
@@ -737,7 +759,7 @@ public class Assets {
         player1CategoryTagImage = new Image(new Texture(Gdx.files.internal("categoryName.png")));
         player1CategoryTagImage.setPosition(0,HEIGHT -105);
         player2CategoryTagImage = new Image(new Texture(Gdx.files.internal("categoryName.png")));
-        player2CategoryTagImage.setPosition(WIDTH- player1CategoryTagImage.getWidth() - 50,HEIGHT- 105);
+        player2CategoryTagImage.setPosition(WIDTH- player1CategoryTagImage.getWidth() - 25,HEIGHT- 105);
         stage.addActor(player1CategoryTagImage);
         stage.addActor(player2CategoryTagImage);
         
@@ -772,12 +794,14 @@ public class Assets {
 
         // Player Qs and As Text Label
         player1QsANDAsLabel = new Label(player1.getName() + "'s Questions & Correct Answers: ", bigLabelStyleWhite);
-        player1QsANDAsLabel.setPosition(5, HEIGHT/2 + 100);
+        player1QsANDAsLabel.setPosition(5, HEIGHT/2 + 200);
         stage.addActor(player1QsANDAsLabel);
+        player1QsANDAsLabel.setVisible(false);
         
         player2QsANDAsLabel = new Label(player2.getName() + "'s Questions & Correct Answers: ", bigLabelStyleWhite);
-        player2QsANDAsLabel.setPosition(WIDTH - 450, HEIGHT/2 + 100);
+        player2QsANDAsLabel.setPosition(WIDTH - 450, HEIGHT/2 + 200);
         stage.addActor(player2QsANDAsLabel);
+        player2QsANDAsLabel.setVisible(false);
         
         // Score Labels
         //player1ScoreLabel = new Label("Player 1 Score: " + player1.getScore(), bigLabelStyle);
@@ -812,7 +836,7 @@ public class Assets {
         if (playerQuestions == player1Questions) {
             x = 25;
         } else {
-            x = WIDTH/2 + 250;
+            x = WIDTH/2 + 300;
         }
         
         
@@ -829,17 +853,17 @@ public class Assets {
            
             stage.addActor(currentQLabel);
             if (currentQuestionString.length() > 60) {
-               currentQLabel.setPosition(x, (HEIGHT/2 + 50) - i * 40);
-               currentALabel.setPosition(x, ((HEIGHT/2 + 30) - i * 40));
+               currentQLabel.setPosition(x, (HEIGHT/2 + 220) - i * 60);
+               currentALabel.setPosition(x, ((HEIGHT/2 + 200) - i * 60));
                stage.addActor(currentALabel);
             } else if (currentQuestionString.length() > 100) {
-               currentQLabel.setPosition(x, (HEIGHT/2 + 0) - i * 40);
-               currentALabel.setPosition(x, ((HEIGHT/2 - 20) - i * 40));
+               currentQLabel.setPosition(x, (HEIGHT/2 + 0) - i * 60);
+               currentALabel.setPosition(x, ((HEIGHT/2 - 20) - i * 60));
                stage.addActor(currentALabel);
             } else {
-                currentQLabel.setPosition(x, (HEIGHT/2 + 60) - i * 40); // 60 was good 
+                currentQLabel.setPosition(x, (HEIGHT/2 + 230) - i * 60); // 60 was good 
                 stage.addActor(currentALabel);
-                currentALabel.setPosition(x, ((HEIGHT/2 + 40) - i * 40)); // 40 was good
+                currentALabel.setPosition(x, ((HEIGHT/2 + 210) - i * 60)); // 40 was good
             }
         }
     }

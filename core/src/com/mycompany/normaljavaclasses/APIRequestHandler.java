@@ -38,53 +38,53 @@ public class APIRequestHandler {
     public static List<Question> makeRequest(String numQuestions, String category, String difficulty) {
     
         try {
-            //"https://opentdb.com/api.php?amount=" + 10&token=YOURTOKENHERE
-        URL apiURL = new URL("https://opentdb.com/api.php?amount=" + numQuestions + "&category=" + category + "&difficulty=" + difficulty + "&type=multiple"); // this is the url we will be taking info from
-        
-        HttpURLConnection URLconnection = (HttpURLConnection) apiURL.openConnection(); // create an internet connection to the url
-        
-        URLconnection.setRequestMethod("GET"); // set its request to getting the info from the url
-    
-        int responseCode = URLconnection.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-        
-        BufferedReader reader = new BufferedReader(new InputStreamReader(URLconnection.getInputStream())); // create a reader to read the info
-        String line; 
-        StringBuilder stringbuilder = new StringBuilder();
-        
-        while ((line = reader.readLine()) != null) { // while the current line is not null
-            stringbuilder.append(line); // append it to stringbuilder
-        }
-        reader.close();
-        
-        
-        String jsonString = stringbuilder.toString();
-        
-         
-        //System.out.println("API Response: " + jsonString);
-   
-        
-        URLconnection.disconnect();
-        
-        
-        
-        
-        
-        Gson gson = new Gson();
-        QuestionContainer qc = gson.fromJson(jsonString, QuestionContainer.class); 
-        List<Question> questions = qc.getQuestions();
-        
-        
-        if (questions != null) {
-            for (Question question : questions) {
-                //System.out.println(StringEscapeUtils.unescapeHtml4(question.getQuestion())); // decode the json string to eliminate the HTML characters and make that the string
+                //"https://opentdb.com/api.php?amount=" + 10&token=YOURTOKENHERE
+            URL apiURL = new URL("https://opentdb.com/api.php?amount=" + numQuestions + "&category=" + category + "&difficulty=" + difficulty + "&type=multiple"); // this is the url we will be taking info from
+
+            HttpURLConnection URLconnection = (HttpURLConnection) apiURL.openConnection(); // create an internet connection to the url
+
+            URLconnection.setRequestMethod("GET"); // set its request to getting the info from the url
+
+            int responseCode = URLconnection.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(URLconnection.getInputStream())); // create a reader to read the info
+            String line; 
+            StringBuilder stringbuilder = new StringBuilder();
+
+            while ((line = reader.readLine()) != null) { // while the current line is not null
+                stringbuilder.append(line); // append it to stringbuilder
             }
-        } else {
-            System.out.println("No questions");
-        }
-        return questions;
-        
-    
+            reader.close();
+
+
+            String jsonString = stringbuilder.toString();
+
+
+            //System.out.println("API Response: " + jsonString);
+
+
+            URLconnection.disconnect();
+
+
+
+
+
+            Gson gson = new Gson();
+            QuestionContainer qc = gson.fromJson(jsonString, QuestionContainer.class); 
+            List<Question> questions = qc.getQuestions();
+
+
+            if (questions != null) {
+                for (Question question : questions) {
+                    //System.out.println(StringEscapeUtils.unescapeHtml4(question.getQuestion())); // decode the json string to eliminate the HTML characters and make that the string
+                }
+            } else {
+                System.out.println("No questions");
+            }
+            return questions;
+
+
         } catch (MalformedURLException ex) { //if the url is not valid
             Logger.getLogger(APIRequestHandler.class.getName()).log(Level.SEVERE, null, ex); 
 

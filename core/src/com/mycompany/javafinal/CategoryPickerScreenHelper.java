@@ -15,6 +15,7 @@ import com.mycompany.normaljavaclasses.Category;
 import com.mycompany.normaljavaclasses.Player;
 import com.mycompany.normaljavaclasses.Question;
 import java.util.List;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  *
@@ -67,6 +68,11 @@ public class CategoryPickerScreenHelper {
     private List<Question> player2Questions;
     private final CategoryPickerScreen categoryPickerScreen;
     private final Label spaceLabel;
+    
+    boolean executed = false;
+    private final Label choosePlayer1Label;
+    private final Label revealPlayer1Label;
+
 
     // Constructor
     public CategoryPickerScreenHelper(Assets assets, CategoryPickerScreen categoryPickerScreen) {
@@ -105,6 +111,11 @@ public class CategoryPickerScreenHelper {
         timerLabel = assets.getTimerLabel();
         this.spaceLabel = assets.getSpaceLabel();
         
+        choosePlayer1Label = assets.getChoosePlayer1Label();
+        revealPlayer1Label = assets.getRevealPlayer1Label();
+        
+
+        
     }
     
     // User Input Methods
@@ -140,25 +151,37 @@ public class CategoryPickerScreenHelper {
         player1IconImage.setVisible(true);
     }
     
-    public void enterAndPlayer2EnteredName() {
-        errorEnterNameLabel.setVisible(false);
-        Assets.errorNameTooLongLabel.setVisible(false);
-        nameLabelNote.setVisible(false);
-        enterSFX.play();
-        wheel.setVisible(true);
-        spaceLabel.setVisible(true);
-        player2NameLabel.setText(player2NameLabel.getText() + nameFieldUI2.getText());
-        Gdx.input.setOnscreenKeyboardVisible(false);
+    public boolean enterAndPlayer2EnteredName() {
+        System.out.print(nameFieldUI2.getText());
+        System.out.print(player1.getName());
+        if (nameFieldUI2.getText().equals(player1.getName())) {
+            System.out.print(nameFieldUI2.getText() + "  ");
+            System.out.print(player1.getName() + "  ");
+            System.out.print("SAME NAME");
+            // Add label to show to the screen to tell player 2 change name that is not player 1s
+            return false;
+        } else {
+            errorEnterNameLabel.setVisible(false);
+            Assets.errorNameTooLongLabel.setVisible(false);
+            nameLabelNote.setVisible(false);
+            enterSFX.play();
+            wheel.setVisible(true);
+            spaceLabel.setVisible(true);
+            player2NameLabel.setText(player2NameLabel.getText() + nameFieldUI2.getText());
+            Gdx.input.setOnscreenKeyboardVisible(false);
 
 
 
-        // PLAYER 2 TEXT FIELDS ARE HIDDEN
-        nameFieldUI2.setVisible(false);
-        nameLabelUI2.setVisible(false);
+            // PLAYER 2 TEXT FIELDS ARE HIDDEN
+            nameFieldUI2.setVisible(false);
+            nameLabelUI2.setVisible(false);
 
-        player2NameTagImage.setVisible(true);
-        player2NameLabel.setVisible(true);
-        player2IconImage.setVisible(true);
+            player2NameTagImage.setVisible(true);
+            player2NameLabel.setVisible(true);
+            player2IconImage.setVisible(true);
+            return true;
+
+        }
     }
     
     public void spacePressedAndPlayer1EnteredName() {
@@ -206,14 +229,12 @@ public class CategoryPickerScreenHelper {
         categoryAppearSFX.play();
         player1 = new Player(nameFieldUI.getText(), 0, selectedCategory);
 
-        //run();
-        player1Questions = APIRequestHandler.makeRequest("10", player1.getCategory().getCategoryNumber(), "easy");
-        
-        for (Question q: player1Questions) {
-            System.out.print(q.getQuestion());
-        }
-
-        System.out.println("Player 1 (" + player1.getName() + " )Selected Category: " + player1.getCategory());
+        Thread th = new Thread(() -> {
+            player1Questions = APIRequestHandler.makeRequest("10", player1.getCategory().getCategoryNumber(), "easy");
+        });
+        th.start();
+       
+        System.out.println("Player 1" + player1.getName() + "Selected Category: " + player1.getCategory());
         player1NameLabel.setVisible(true);
         player1CategoryLabel.setText("Player 1 Category: \n" + player1.getCategory());
         player1CategoryTagImage.setVisible(true);
@@ -241,14 +262,23 @@ public class CategoryPickerScreenHelper {
         timerLabel.setVisible(true);
             countdownTime -= dt;
             timerLabel.setText("Countdown Until Game Start: " + (int) countdownTime);
+            // Put this condition check here for API request purposes because api requires a certain amt of time between requests
+            
+            if(countdownTime <= 2 & !executed) {
+                executed = true;
+                Thread th = new Thread(() -> {
+                    player2Questions = APIRequestHandler.makeRequest("10", player2.getCategory().getCategoryNumber(), "easy");
+                });
+                th.start();
+            }
+            
             if(countdownTime <= 0) {
-                // Put it here for API request purposes
-                player2Questions = APIRequestHandler.makeRequest("10", player2.getCategory().getCategoryNumber(), "easy");
-                for (Question q: player2Questions) {
-                    System.out.print(q.getQuestion());
-                }
-                categoryPickerScreen.dispose();
+//                player2Questions = APIRequestHandler.makeRequest("10", player2.getCategory().getCategoryNumber(), "easy");
+//                for (Question q: player2Questions) {
+//                    System.out.print(q.getQuestion());
+//                }
                 game.setScreen(new GameScreen(game, player1NameTagImage, player2NameTagImage, player1CategoryTagImage, player2CategoryTagImage, player1NameLabel, player2NameLabel, player1CategoryLabel, player2CategoryLabel, player1, player2, player1Questions, player2Questions));
+                categoryPickerScreen.dispose();
             }
     }
     
@@ -282,5 +312,18 @@ public class CategoryPickerScreenHelper {
             return Category.VEHICLES;
         }
         return null;
+    }
+
+    void choosePlayer1() {
+        double random = Math.random();
+        String coin = "";
+        if (random >= .5) {
+            coin = "HEADS";
+        } else {
+            coin = "TAILS";
+        }
+                
+        revealPlayer1Label.setText(coin);
+        revealPlayer1Label.setVisible(true);
     }
 }

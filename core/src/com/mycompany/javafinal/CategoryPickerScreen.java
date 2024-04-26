@@ -18,7 +18,7 @@ import static com.mycompany.javafinal.Drop.HEIGHT;
 import static com.mycompany.javafinal.Drop.WIDTH;
 import com.mycompany.normaljavaclasses.Category;
 
-public class CategoryPickerScreen implements Screen, Runnable{
+public class CategoryPickerScreen implements Screen{
     private final Drop game;
     public static final String TITLE = "Teo's Trivia Competition";
 
@@ -85,6 +85,9 @@ public class CategoryPickerScreen implements Screen, Runnable{
             @Override
             public boolean keyDown(InputEvent e, int key) {
                 
+//                if(key == Keys.R) {
+//                    categoryPickerScreenHelper.choosePlayer1();
+//                }
                 if(key == Keys.ENTER & !player1EnteredName) {
                     
                     if(nameFieldUI.getText().length() == 0) {
@@ -108,16 +111,16 @@ public class CategoryPickerScreen implements Screen, Runnable{
                     if(nameFieldUI2.getText() == "") {
                         categoryPickerScreenHelper.enterAndNoPlayerName();
                         return true;
-//                    
+                    
                     } else if(nameFieldUI2.getText().length() > 7) {
                         categoryPickerScreenHelper.enterAndPlayerNameLong();
                         return true;
-//                        
+                        
                     } else {
-                        categoryPickerScreenHelper.enterAndPlayer2EnteredName();
-                        player2EnteredName = true;
+                        player2EnteredName = categoryPickerScreenHelper.enterAndPlayer2EnteredName();
+                        //player2EnteredName = true;
                         return true;
-//                        
+                        
                     }
                 }
             
@@ -207,18 +210,7 @@ public class CategoryPickerScreen implements Screen, Runnable{
                 doOnlyOnce = true;
             }
     }
-    
-    @Override
-    public void run() {
-        synchronized (this) {
-            //player1Questions = APIRequestHandler.makeRequest("10", player1.getCategory().getCategoryNumber(), "easy");
-        }
-        //makeThread();
-    }
-    
-//    public List<Question> makeThread () {
-//        //return APIRequestHandler.makeRequest("10", player1.getCategory().getCategoryNumber(), "easy");
-//    }
+
     @Override
     public void resize(int width, int height) {
     }

@@ -4,7 +4,6 @@
  */
 package com.mycompany.normaljavaclasses;
 
-import com.mycompany.normaljavaclasses.Category;
 
 /**
  *
@@ -13,7 +12,7 @@ import com.mycompany.normaljavaclasses.Category;
 public class Player {
     private String name;
     private int score;
-    private Category category;
+    private final Category category;
     
     public Player(String n, int s, Category c) {
         this.name = n;
@@ -35,5 +34,9 @@ public class Player {
     
     public Category getCategory () {
         return category;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

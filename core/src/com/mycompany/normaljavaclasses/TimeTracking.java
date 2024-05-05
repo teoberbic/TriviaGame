@@ -13,7 +13,7 @@ public class TimeTracking {
 //    start a task related to this project and the time you stop. You should include a small comment to indicate what you
 //    spent your time doing: planning features, brainstorming, coding features, testing, etc. Be honest with yourself, and do
 //    not include time that you were half working and half looking at your phone or streaming video. 
-//Feb 8 -- 9am - 11am --- doing FP1 and design initial design/UI mock ups
+// Feb 8 -- 9am - 11am --- doing FP1 and design initial design/UI mock ups
 // Feb 13 --11:30 am - 2pm --- planning out everything in google doc & created APIRequestHanlder class and made first request from API
 // Feb 13 -- 6pm - 7pm --- json to gson api request and put whole request in QuestionContainer class list and parsed each Question within the class
 // Feb 14 -- 8pm - 10pm --- figuring out html characters in my json string responses and how to convert them to normal characters
@@ -24,9 +24,21 @@ public class TimeTracking {
 // Mar 16 -- 9am - 11am -- Figuring out how Scene2D to works, taking notes about it, planning how I would use it
 // Mar 17 -- 10am - 1pm -- Getting/Implementing assets, starting CategoryPickerScreen UI and logic with Scene2D
 // Mar 18 -- 2pm - 4pm -- Implementing logic of player1 entering name, picking category, getting their category assigned to them, and same for player 2
-// Mar 19 -- 9am - 12 pm --
-// Mar 20 -- 9am - 11am -- 
-// Mar 23 -- 9am - 10am --
-// Mar 24 -- 9am - 11 am --
+// Mar 19 -- 9am - 12 pm -- Planning out game Screen on paper, and transitioning from Category Screen to Game Screen. Implementing game assets onto the screen
+// Mar 20 -- 9am - 11am -- Figuring out buttons and making assets different colors after hover, start to display questions and answers
+// Mar 21 -- 12pm - 3pm -- Putting all assets into one Assets class to abstract assets more for readability
+// Mar 23 -- 9am - 10am -- Position question and answers correctly but still have bug strings going over border
+// Mar 24 -- 9am - 11 am -- Figuring out game flow of game on paper and how player transitions will work/ starting to implement it
+// Mar 27 -- 6pm - 8pm -- Planning out exactly players will switch turns and what needs to change in between the transition
+// Apr 11 -- 7pm - 9pm -- Adding score text if player got question right along with red x if they got it wrong, also added sound effects and background music
+// Apr 12 -- 6pm - 8pm -- Starting EndGameScreen and planning exactly what needs to go on it on drawing tool
+// Apr 13 -- 8pm - 9pm -- Trying to seperate out Category Screen into two classes functionality wise
+// Apr 17 -- 9pm - 12am -- Adding assets to End Game Screen to show who won, replay feature, and starting with putting text answers on the screen
+// Apr 18 -- 3pm - 5pm -- Getting stuck on text overlapping and had to plan it out on paper to fix logic and fix the text
+// Apr 19 -- 4pm - 6pm -- Transitioning to multiple Assets Classes for each screen as a singleton instead of one giant asset class
+// Apr 25 -- 6pm - 8pm -- Getting threads to work to call API requests, spent a lot of time thinking of different ways I could do it
+// Apr 27 -- 10am - 12pm -- Fixing question appearing twice and error handling, players cannot have same name
+// Apr 29 -- 1pm - 2pm -- Cleaned up code for wheel to be shorter and less if statements
+// Apr 30 -- 7pm - 10pm -- Made Game Helper class to spread out functionality and started distributing the code
     
 }

@@ -5,7 +5,6 @@
 package com.mycompany.javafinal;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -32,8 +31,6 @@ public class Drop extends Game {
     }
 
     @Override
-    public void dispose() {
-        //batch.dispose();
-    }
+    public void dispose() {}
 
 }

@@ -10,7 +10,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -28,7 +27,7 @@ import java.util.List;
 public class EndGameScreen implements Screen{
 
     private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;;;
-    private Assets assets;
+    private OtherAssets assets;
     private final Player player1;
     private final Player player2;
     private final List<Question> player1Questions;
@@ -38,7 +37,6 @@ public class EndGameScreen implements Screen{
     private final Drop game;
     private Music endGameCheer;
     
-    //Drop game, Image player1ScoreTagImage, Image player2ScoreTagImage, Label player1ScoreLabel, Label player2ScoreLabel, Player player1, Player player2, List<Question> player1Questions, List<Question> player2Questions
     public EndGameScreen(Drop game, Player player1, Player player2, List<Question> player1Questions, List<Question> player2Questions) {
         this.game = game;
         this.player1 = player1;
@@ -46,12 +44,10 @@ public class EndGameScreen implements Screen{
         this.player1Questions = player1Questions;
         this.player2Questions = player2Questions;
         
-        assets = new Assets(stage, player1, player2, player1Questions, player2Questions);
+        // Pass in some fields as Asset class will need access to them
+        assets = new OtherAssets(stage, player1, player2, player1Questions, player2Questions);
     }
     
-    
-    
-
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
@@ -78,37 +74,24 @@ public class EndGameScreen implements Screen{
     public void render(float f) {
         // clear the screen with black 
         ScreenUtils.clear(0, 0, 0, 0);
-
-        // tell the camera to update its matrices.
-        camera.update();
-        
-        //showPlayer1Questions();
-        
         
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
 
-//    public void showPlayer1Questions() {
-//        for
-//    }
-    
     @Override
     public void resize(int i, int i1) {
         stage.getViewport().update(WIDTH, HEIGHT, true);
     }
 
     @Override
-    public void pause() {
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {

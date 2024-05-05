@@ -7,22 +7,11 @@ package com.mycompany.javafinal;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-//import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 
 //questionable imports
@@ -38,39 +27,24 @@ import static com.mycompany.javafinal.Drop.WIDTH;
  */
 public class MainMenuScreen implements Screen{
     private final Drop game;
-    private Texture startButtonTexture;
-    Rectangle startButton;
-    private Sound startButtonSound;
     private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;;;
-    private Label welcomeText;
-    private Label welcomeText2;
-    private Texture backgroundImageTexture;
-    private Image backgroundImage;
     private Music backgroundMusic;
-    private Skin skinUI;
-    private Label welcomeTextLabel;
-    private Label welcomeTextLabel2;
     private ImageButton imageButton;
 
-    OrthographicCamera camera;
-    Assets assets;
+    OtherAssets assets;
     
-
     public MainMenuScreen(final Drop game) {
         this.game = game;
     }
     @Override
     public void show() {
+        
         // All assets are in a new class for encapsualtion then call the loadCategoryPickerScreen method so they get loaded
-        assets = new Assets(stage);
+        assets = new OtherAssets(stage);
         assets.loadMainMenuScreen();
         backgroundMusic = assets.getBackgroundMusic();
         backgroundMusic.play();
         imageButton = assets.getImageButton();
-        
-        // Camera
-        //camera = new OrthographicCamera();
-        //camera.setToOrtho(false, WIDTH, HEIGHT);
 
         Gdx.input.setInputProcessor(stage); // set the stage for input to be processed through
         
@@ -90,28 +64,21 @@ public class MainMenuScreen implements Screen{
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 0);
 
-        //camera.update();
-        //game.batch.setProjectionMatrix(camera.combined);
-
         stage.act();
         stage.draw();
     }
 
     @Override
-    public void resize(int width, int height) {
-    }
+    public void resize(int width, int height) {}
 
     @Override
-    public void pause() {
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {

@@ -13,9 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import static com.mycompany.javafinal.Drop.HEIGHT;
-import static com.mycompany.javafinal.Drop.WIDTH;
 import com.mycompany.normaljavaclasses.Category;
 
 public class CategoryPickerScreen implements Screen{
@@ -32,7 +29,6 @@ public class CategoryPickerScreen implements Screen{
     private boolean player1GotCategoryBool = false;
 
     // Player 2 Fields
-    //private boolean player2TextFieldAppeared = false;
     private boolean player2EnteredName = false;
     private boolean player2SpunWheel = false;
     private boolean player2GotCategoryBool = false;
@@ -50,31 +46,35 @@ public class CategoryPickerScreen implements Screen{
     private boolean countDownTimerCanStart = false;
     private Sound clockTickingSFX;
     boolean doOnlyOnce = false;
+    private boolean coinShowTime = false;
+    private boolean coinWasFlipped = false;
+    private boolean disableCoin = false;
     
-    private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;;
-    private Assets assets;
+    
+    private Stage stage;
+    private CategoryPickerScreenAssets cpsa;
     
     
     private CategoryPickerScreenHelper categoryPickerScreenHelper;
-
+    
     // Constructor
     public CategoryPickerScreen (Drop game) {
         this.game = game;
+        cpsa = CategoryPickerScreenAssets.getInstance();
     }
 
     @Override
-    public void show() { //initializes everything when this screen is shown, used as the consructor of LibGDX
+    public void show() { // Initializes everything when this screen is shown, used as the consructor of LibGDX
+        cpsa.loadAssets(); // All assets are in a new class for encapsualtion then call load method to load
+        stage = CategoryPickerScreenAssets.stage;
         
-        // All assets are in a new class for encapsualtion then call the loadCategoryPickerScreen method so they get loaded
-        assets = new Assets(stage);
-        assets.loadCategoryPickerScreen();
-        categoryPickerScreenHelper = new CategoryPickerScreenHelper(assets, this);
+        categoryPickerScreenHelper = CategoryPickerScreenHelper.makeCategoryPickerScreenHelper(cpsa,this);
 
         // Still need some assets present in this window because I need a references when changes will be made to them
-        wheel = assets.getWheel();
-        nameFieldUI = assets.getNameFieldUI();
-        nameFieldUI2 = assets.getNameFieldUI2();
-        clockTickingSFX = assets.getClockTickingSFX();
+        wheel = CategoryPickerScreenAssets.wheel;
+        nameFieldUI = CategoryPickerScreenAssets.nameFieldUI;
+        nameFieldUI2 = CategoryPickerScreenAssets.nameFieldUI2;
+        clockTickingSFX = CategoryPickerScreenAssets.clockTickingSFX;
         
         // Set stage as the Input Processor
         Gdx.input.setInputProcessor(stage);
@@ -85,18 +85,18 @@ public class CategoryPickerScreen implements Screen{
             @Override
             public boolean keyDown(InputEvent e, int key) {
                 
-//                if(key == Keys.R) {
-//                    categoryPickerScreenHelper.choosePlayer1();
-//                }
-                if(key == Keys.ENTER & !player1EnteredName) {
-                    
+                if(key == Keys.R & !coinShowTime & !disableCoin) {
+                    coinShowTime = categoryPickerScreenHelper.choosePlayer1();
+                }
+                
+                if(key == Keys.ENTER & !player1EnteredName & coinWasFlipped) {
                     if(nameFieldUI.getText().length() == 0) {
                         //show error message to enter something
                        categoryPickerScreenHelper.enterAndNoPlayerName();
-                
                         return true;
                         
                     } else if(nameFieldUI.getText().length() > 6) {
+                        //show error message name is too long
                         categoryPickerScreenHelper.enterAndPlayerNameLong();
                         return true;
     
@@ -157,6 +157,8 @@ public class CategoryPickerScreen implements Screen{
         stage.draw();
     }
 
+    // Code Adapted from https://www.youtube.com/watch?v=F3-lK_-PQr0 & https://www.youtube.com/watch?v=emz_ggOHMuo
+    
     private void spinWheel() {
         // Spin the wheel with a random duration and rotation
         
@@ -178,10 +180,7 @@ public class CategoryPickerScreen implements Screen{
                     categoryPickerScreenHelper.player1SpunWheel(selectedCategory);
                     player1SpunWheel = true;
                     player1GotCategoryBool = true;
-                    // PLAYER 1 GOT CATEGORY ASSIGNED SO MAKE PLAYER 2S TEXT BOX APPEAR
-                    //player2TextFieldAppeared = true;
-
-                    //waits 3 seconds and then set it to false
+                    
                     player1WheelTimeStarted = true;
 
                 } else if (player2SpunWheel & !player2GotCategoryBool){ // IF PLAYER 1 ALREADY HAS CATEGORY THEN THIS SPIN IS TO BE ASSIGNED TO PLAYER 2
@@ -189,7 +188,6 @@ public class CategoryPickerScreen implements Screen{
 
                     player2GotCategoryBool = true;
 
-                    // wait a second
                     player2WheelTimeStarted = true;
                 }
             }
@@ -212,20 +210,16 @@ public class CategoryPickerScreen implements Screen{
     }
 
     @Override
-    public void resize(int width, int height) {
-    }
+    public void resize(int width, int height) {}
 
     @Override
-    public void hide() {
-    }
+    public void hide() {}
 
     @Override
-    public void pause() {
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-    }
+    public void resume() {}
 
     @Override
     public void dispose () {
@@ -237,6 +231,14 @@ public class CategoryPickerScreen implements Screen{
         ScreenUtils.clear(0, 0, 0, 0);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 
+        if(coinShowTime) {
+            coinShowTime = categoryPickerScreenHelper.coinTime(Gdx.graphics.getDeltaTime());
+            if(!coinShowTime) {
+               coinWasFlipped = true;
+               disableCoin = true;
+            }
+                
+        }
         // Timer to show player 1 their category on the wheel before hiding wheel
         if (player1WheelTimeStarted & !player1WheelTimeHappendBefore) {
             player1WheelTime(Gdx.graphics.getDeltaTime());

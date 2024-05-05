@@ -13,13 +13,10 @@ import java.util.List;
  * @author teoberbic
  */
 public class QuestionContainer {
+    
     private List<Question> results;
     
     public List<Question> getQuestions() {
         return results;
-    }
-    
-    public static void Main (String[] args) {
-        
     }
 }

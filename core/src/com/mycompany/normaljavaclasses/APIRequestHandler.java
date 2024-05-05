@@ -10,18 +10,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.http.HttpRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.net.http.HttpResponse;
-import java.net.http.HttpClient;
 import com.google.gson.Gson;
-//import com.mycompany.normaljavaclasses.Question;
-//import com.mycompany.javafinal2.QuestionContainer;
-//import normaljavaclasses.TriviaGUI;
-import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.text.StringEscapeUtils;
 
 
 /**
@@ -30,10 +22,7 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class APIRequestHandler {
     
-    
-    
     private APIRequestHandler(){};
-    
     
     public static List<Question> makeRequest(String numQuestions, String category, String difficulty) {
     
@@ -61,29 +50,13 @@ public class APIRequestHandler {
             String jsonString = stringbuilder.toString();
 
 
-            //System.out.println("API Response: " + jsonString);
-
-
             URLconnection.disconnect();
-
-
-
-
 
             Gson gson = new Gson();
             QuestionContainer qc = gson.fromJson(jsonString, QuestionContainer.class); 
             List<Question> questions = qc.getQuestions();
 
-
-            if (questions != null) {
-                for (Question question : questions) {
-                    //System.out.println(StringEscapeUtils.unescapeHtml4(question.getQuestion())); // decode the json string to eliminate the HTML characters and make that the string
-                }
-            } else {
-                System.out.println("No questions");
-            }
             return questions;
-
 
         } catch (MalformedURLException ex) { //if the url is not valid
             Logger.getLogger(APIRequestHandler.class.getName()).log(Level.SEVERE, null, ex); 

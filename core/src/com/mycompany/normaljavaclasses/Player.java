@@ -14,10 +14,15 @@ public class Player {
     private int score;
     private final Category category;
     
-    public Player(String n, int s, Category c) {
+    private Player(String n, int s, Category c) {
         this.name = n;
         this.score = s;
         this.category = c;
+    }
+    
+    // Uses Static Factory
+    public static Player makePlayer(String n, int s, Category c) {
+        return new Player(n, s, c);
     }
     
     public void updateScore() {

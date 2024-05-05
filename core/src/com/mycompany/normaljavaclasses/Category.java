@@ -23,6 +23,7 @@ public enum Category {
     VEHICLES ("28");
     
     private final String categoryNumber;
+    
     private Category (String num) {
         this.categoryNumber = num;
     }

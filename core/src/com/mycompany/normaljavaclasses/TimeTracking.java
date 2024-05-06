@@ -9,10 +9,7 @@ package com.mycompany.normaljavaclasses;
  * @author teoberbic
  */
 public class TimeTracking {
-//    Before you write even one line of code, create a file called “Time Tracking” and log the date and time when you
-//    start a task related to this project and the time you stop. You should include a small comment to indicate what you
-//    spent your time doing: planning features, brainstorming, coding features, testing, etc. Be honest with yourself, and do
-//    not include time that you were half working and half looking at your phone or streaming video. 
+
 // Feb 8 -- 9am - 11am --- doing FP1 and design initial design/UI mock ups
 // Feb 13 --11:30 am - 2pm --- planning out everything in google doc & created APIRequestHanlder class and made first request from API
 // Feb 13 -- 6pm - 7pm --- json to gson api request and put whole request in QuestionContainer class list and parsed each Question within the class
@@ -40,5 +37,6 @@ public class TimeTracking {
 // Apr 27 -- 10am - 12pm -- Fixing question appearing twice and error handling, players cannot have same name
 // Apr 29 -- 1pm - 2pm -- Cleaned up code for wheel to be shorter and less if statements
 // Apr 30 -- 7pm - 10pm -- Made Game Helper class to spread out functionality and started distributing the code
+// May 1 - 5 -- Paper, presentation, comments in code
     
 }

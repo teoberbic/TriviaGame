@@ -22,12 +22,13 @@ import static com.mycompany.javafinal.Drop.WIDTH;
  *
  * @author teoberbic
  */
+// Singleton
 public class CategoryPickerScreenAssets {
     
     // Declare Vars
     public static Image arrowImage;
     public static Image wheel;
-    public static Image player1NameTagImage = new Image(new Texture(Gdx.files.internal("playerName.png")));;
+    public static Image player1NameTagImage;
     public static Image player2NameTagImage;
     public static Image player1CategoryTagImage;
     public static Image player2CategoryTagImage;
@@ -46,9 +47,8 @@ public class CategoryPickerScreenAssets {
     public static TextField nameFieldUI2;
     public static Label player2NameLabel;
     public static Label player2CategoryLabel;
-    public static final float countdownTime = 10;
+    public static float countdownTime = 10;
     public static Label timerLabel;
-    
     public static Stage stage;
     public static CategoryPickerScreenAssets cpsa = null;
     public static Label nameLabelNote;
@@ -64,9 +64,7 @@ public class CategoryPickerScreenAssets {
     public static Label errorSameNameLabel;
     public static Label errorNameTooLongLabel;
     
-    private CategoryPickerScreenAssets(){
-        
-    }
+    private CategoryPickerScreenAssets(){}
     
     public static CategoryPickerScreenAssets getInstance() {
         if (cpsa == null) {
@@ -75,14 +73,13 @@ public class CategoryPickerScreenAssets {
         return cpsa;
     } 
     
-    public void loadAssets() {
-        // Stage
-        stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is
+    public void loadAssets() { // Initialize all Assets
+        stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // Where the view of the stage is
         
         // Wheel
         wheel = new Image(new Texture(Gdx.files.internal("wheel3.png")));
-        wheel.setOrigin(wheel.getWidth()/2, wheel.getHeight()/2); // sets the center of image as the origin so it spins from the center
-        wheel.setPosition(WIDTH/2 - wheel.getWidth()/2, Gdx.graphics.getHeight()/2 - wheel.getHeight()/2); // where the image is on the sreen
+        wheel.setOrigin(wheel.getWidth()/2, wheel.getHeight()/2); // Sets the center of image as the origin so it spins from the center
+        wheel.setPosition(WIDTH/2 - wheel.getWidth()/2, Gdx.graphics.getHeight()/2 - wheel.getHeight()/2); // Where the image is on the screen
         stage.addActor(wheel);
         wheel.setVisible(false);
         
@@ -106,6 +103,7 @@ public class CategoryPickerScreenAssets {
         stage.addActor(player2CategoryTagImage);
         player2CategoryTagImage.setVisible(false);
         
+        // Arrow
         arrowImage = new Image(new Texture(Gdx.files.internal("arrow.png")));
         arrowImage.setPosition(WIDTH/2 - arrowImage.getWidth()/2 - 1, HEIGHT - 50 - arrowImage.getHeight()/2);
         stage.addActor(arrowImage);
@@ -161,7 +159,7 @@ public class CategoryPickerScreenAssets {
         stage.addActor(player1CategoryLabel);
         player1CategoryLabel.setVisible(false);
         
-        // Player 2 (Note create a function so you dont have to make 2 of these)
+        // Input Handling Player 2
         tableUI2 = new Table();
         tableUI2.setFillParent(true);
         stage.addActor(tableUI2);

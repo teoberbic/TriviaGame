@@ -25,7 +25,6 @@ import java.util.List;
  */
 public class GameScreen implements Screen {
     private final Drop game;
-   
     
     // Passed in from CategoryPickerScreen
     private Player player1;
@@ -40,23 +39,14 @@ public class GameScreen implements Screen {
     private int player2CurrentQuestionIndex = 0;
     private Player currentPlayer;
     private Label currentPlayerScoreLabel;
-    
-    private Label questionLabel;
-   
     private List<Label> answerLabels;
-
-    // Timer
     private float timer = 15;
     private Label timerLabel;
-    private float showAnswerImageTime = 1;
-
-    // Logic Booleans
     private boolean player1Turn = true;
     private boolean player2CanEnterCondition = false;
     private boolean player2Turn = false;
     private boolean showCorrectAnswerDelay = false;
     private boolean showIncorrectAnswerDelay = false;
-    
     private OtherAssets assets;
     private Sound correctAnswerSFX;
     private Sound incorrectAnswerSFX;
@@ -67,11 +57,11 @@ public class GameScreen implements Screen {
     private Label player2TurnLabel;
     private GameScreenAssets gsa;
     private Stage stage;
-    
     private GameScreenHelper gameHelperScreen;
     private Label player1CurrentIndexLabel;
     
     public GameScreen(final Drop game, Image player1NameTagImage, Image player2NameTagImage, Image player1CategoryTagImage, Image player2CategoryTagImage, Label player1NameLabel, Label player2NameLabel, Label player1CategoryLabel, Label player2CategoryLabel, Player player1, Player player2, List<Question> player1Questions, List<Question> player2Questions) {
+        // Assigns all vars sent in by CategoryPickerScreen
         this.game = game;
         this.player1 = player1;
         this.player2 = player2;
@@ -79,17 +69,17 @@ public class GameScreen implements Screen {
         this.player2Questions = player2Questions;
         currentPlayer = player1;
         
+        // Get the instance of GameScreenAssets but also send in the vars I need to access in the assets class
         gsa = GameScreenAssets.getInstance(player1, player2, player1NameLabel, player2NameLabel, player1CategoryLabel, player2CategoryLabel);
         gsa.loadAssets(); // Ensures all fields are initialized but instance is forced here to load
+        // Sends in the vars I need to access in the helper class
         gameHelperScreen = new GameScreenHelper(gsa,this, player1, player2, player1Questions, player2Questions);
     }
     
     @Override
     public void show() {
-        //gsa.loadAssets(); // Ensures all fields are initialized but instance is forced here to load
-        stage = GameScreenAssets.stage;//new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is
+        stage = GameScreenAssets.stage; 
         
-        // Call the loadGameScreen method so they get loaded
         answerLabels = GameScreenAssets.answerLabels;
         player1ScoreLabel = GameScreenAssets.player1ScoreLabel;
         player2ScoreLabel = GameScreenAssets.player2ScoreLabel;
@@ -107,7 +97,7 @@ public class GameScreen implements Screen {
         
         ImageButton[] imageButtons = GameScreenAssets.imageButtons; 
         
-        // Click Listener For Each Button
+        // Click Listener to Check Click For Each Button
         for (int i = 0; i < imageButtons.length; i++) {
             final int index = i; // Final variable required for inner class access
 
@@ -124,11 +114,10 @@ public class GameScreen implements Screen {
                     } else {
                         // Click equals incorrect Answer
                         incorrectAnswerSFX.play(1.0f);
-                        
-                        // Set true that a incorrect answer was clicked
                         showIncorrectAnswerDelay = true;
                     }
                     
+                    // Switch Players
                     if (currentPlayer.equals(player1)) {
                         currentPlayer = gameHelperScreen.updateCurrentTurn(player2ScoreLabel, player2);
                         player2Turn = true;
@@ -140,6 +129,7 @@ public class GameScreen implements Screen {
                         player2Turn = false;
                         
                     }
+                    // If player 2 is out of questions game is done
                     if (player2CurrentQuestionIndex == 10) {
                         gameHelperScreen.outOfQuestions(game);
                     }
@@ -153,6 +143,63 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update();
         stage.draw();
+    }
+    
+    private void update() {
+        // Clear the screen with black 
+        ScreenUtils.clear(0, 0, 0, 0);
+        
+        if(showCorrectAnswerDelay) {
+            showCorrectAnswerDelay = gameHelperScreen.showAnswerFeedBack(Gdx.graphics.getDeltaTime(), 1);
+            timer = 15;
+        }
+        
+        if(showIncorrectAnswerDelay) {
+            showIncorrectAnswerDelay = gameHelperScreen.showAnswerFeedBack(Gdx.graphics.getDeltaTime(), 0);
+            timer = 15;
+
+        }
+        
+            // Check to see whos turn it is and respond with changes accordingly
+            if (player1Turn) {
+                if (timer <= 0) {
+                    gameHelperScreen.timerRanOut();
+                    showIncorrectAnswerDelay = true;
+                    player2Turn = true;
+                    player1Turn = false;
+                    player2CanEnterCondition = true;
+                    timer = 15;
+                }
+                if(!player2CanEnterCondition) {
+                    currentCorrectAnswer = gameHelperScreen.displayQuestion(player1CurrentQuestionIndex, player1Questions);
+                    player2CanEnterCondition = true;
+                    player1CurrentQuestionIndex += 1;
+                }
+                
+                gameHelperScreen.switchTurnLabels(player1TurnLabel, player2TurnLabel);
+            }
+
+            if (player2Turn) {
+                if (timer <= 0) {
+                    gameHelperScreen.timerRanOut();
+                    showIncorrectAnswerDelay = true;
+                    player1Turn = true;
+                    player2Turn = false;
+                    player2CanEnterCondition = false;
+                    timer = 15;
+                }
+                if(player2CanEnterCondition) {
+                    currentCorrectAnswer = gameHelperScreen.displayQuestion(player2CurrentQuestionIndex, player2Questions);
+                    player2CanEnterCondition = false;
+                    player2CurrentQuestionIndex += 1;
+                }
+                gameHelperScreen.switchTurnLabels(player2TurnLabel, player1TurnLabel);
+            }
+            player1CurrentIndexLabel.setText("Question: " + player1CurrentQuestionIndex);
+            timer -= Gdx.graphics.getDeltaTime();
+            timerLabel.setText("Time: " + (int)timer);
+            
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
     }
     
     @Override
@@ -175,61 +222,5 @@ public class GameScreen implements Screen {
         gameBackgroundMusic.dispose();
     }
 
-    private void update() {
-        // Clear the screen with black 
-        ScreenUtils.clear(0, 0, 0, 0);
-        
-        if(showCorrectAnswerDelay) {
-            showCorrectAnswerDelay = gameHelperScreen.showAnswerFeedBack(Gdx.graphics.getDeltaTime(), 1);
-            timer = 15;
-        }
-        
-        if(showIncorrectAnswerDelay) {
-            showIncorrectAnswerDelay = gameHelperScreen.showAnswerFeedBack(Gdx.graphics.getDeltaTime(), 0);
-            timer = 15;
-
-        }
-        
-            if (player1Turn) {
-                if (timer <= 0) {
-                    gameHelperScreen.timerRanOut();
-                    showIncorrectAnswerDelay = true;
-                    player2Turn = true;
-                    player1Turn = false;
-                    player2CanEnterCondition = true;
-                    timer = 15;
-                }
-                if(!player2CanEnterCondition) {
-                    currentCorrectAnswer = gameHelperScreen.displayQuestion(player1CurrentQuestionIndex, player1Questions);
-                    player2CanEnterCondition = true;
-                    player1CurrentQuestionIndex += 1;
-                    System.out.println("PLAYER 1 CURRENT INDEX:" + player1CurrentQuestionIndex);
-                }
-                
-                gameHelperScreen.switchTurnLabels(player1TurnLabel, player2TurnLabel);
-            }
-
-            if (player2Turn) {
-                if (timer <= 0) {
-                    gameHelperScreen.timerRanOut();
-                    showIncorrectAnswerDelay = true;
-                    player1Turn = true;
-                    player2Turn = false;
-                    player2CanEnterCondition = false;
-                    timer = 15;
-                }
-                if(player2CanEnterCondition) {
-                    currentCorrectAnswer = gameHelperScreen.displayQuestion(player2CurrentQuestionIndex, player2Questions);
-                    player2CanEnterCondition = false;
-                    player2CurrentQuestionIndex += 1;
-                    System.out.println("PLAYER 2 CURRENT INDEX:" + player2CurrentQuestionIndex);
-                }
-                gameHelperScreen.switchTurnLabels(player2TurnLabel, player1TurnLabel);
-            }
-            player1CurrentIndexLabel.setText("Question: " + player1CurrentQuestionIndex);
-            timer -= Gdx.graphics.getDeltaTime();
-            timerLabel.setText("Time: " + (int)timer);
-            
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
-    }
+    
 }

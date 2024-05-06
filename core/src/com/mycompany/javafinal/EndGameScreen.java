@@ -26,13 +26,12 @@ import java.util.List;
  */
 public class EndGameScreen implements Screen{
 
-    private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;;;
+    private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); 
     private OtherAssets assets;
     private final Player player1;
     private final Player player2;
     private final List<Question> player1Questions;
     private final List<Question> player2Questions;
-    private OrthographicCamera camera;
     private ImageButton replayButton;
     private final Drop game;
     private Music endGameCheer;
@@ -43,7 +42,6 @@ public class EndGameScreen implements Screen{
         this.player2 = player2;
         this.player1Questions = player1Questions;
         this.player2Questions = player2Questions;
-        
         // Pass in some fields as Asset class will need access to them
         assets = new OtherAssets(stage, player1, player2, player1Questions, player2Questions);
     }
@@ -51,20 +49,18 @@ public class EndGameScreen implements Screen{
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-        assets.loadEndGameScreen();
+        assets.loadEndGameScreen(); // Load assets
+        
+        // Still need access to some
         replayButton = assets.getReplayButton();
         endGameCheer = assets.getEndGameCheer();
         endGameCheer.play();
         
-        // Create the Camera
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1500, 750);
-        
+        // Add listener to check if replay button is clicked
         replayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-
-                game.setScreen(new MainMenuScreen(game));
+                game.setScreen(new MainMenuScreen(game)); // Go back to the MainMenuScreen and start the game over
                 dispose();
             }
         });

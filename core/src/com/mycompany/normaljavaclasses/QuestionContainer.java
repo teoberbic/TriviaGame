@@ -5,13 +5,13 @@
 package com.mycompany.normaljavaclasses;
 
 //import com.mycompany.normaljavaclasses.Question;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author teoberbic
  */
+// Class to put all of the response questions in a container
 public class QuestionContainer {
     
     private List<Question> results;

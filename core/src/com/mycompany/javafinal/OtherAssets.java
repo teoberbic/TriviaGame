@@ -14,14 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import static com.mycompany.javafinal.Drop.HEIGHT;
 import static com.mycompany.javafinal.Drop.WIDTH;
 import com.mycompany.normaljavaclasses.Player;
 import com.mycompany.normaljavaclasses.Question;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -30,8 +27,8 @@ import org.apache.commons.text.StringEscapeUtils;
  * @author teoberbic
  */
 public class OtherAssets {
+    // MainMenuScreen & EndGameScreen
     Stage stage;
-    // MainMenuScreen
     private Music menuBackgroundMusic;
     private Texture backgroundImageTexture;
     private Image backgroundImage;
@@ -39,46 +36,13 @@ public class OtherAssets {
     private Label welcomeTextLabel2;
     private Texture startButtonTexture;
     private Label.LabelStyle bigLabelStyle;
-    // CategoryPickerScreen
-    private Image player1NameTagImage = new Image(new Texture(Gdx.files.internal("playerName.png")));;
-    private Image player2NameTagImage;
     private Image player1CategoryTagImage;
     private Image player2CategoryTagImage;
-    private Image player1IconImage;
     private Image categoryIcon1;
-    private Image player2IconImage;
     private Image categoryIcon2;
-    private Table tableUI;
     private Skin skinUI;
-    private Label nameLabelUI;
-    private TextField nameFieldUI;
-    private Label player1NameLabel;
     private Label player1CategoryLabel;
-    private Table tableUI2;
-    private Label nameLabelUI2;
-    private TextField nameFieldUI2;
-    private Label player2NameLabel;
     private Label player2CategoryLabel;
-    // GameScreen
-    private float timer = 15;
-    private Image questionLabelImage;
-    private Label questionLabel;
-    List<Label> answerLabels = new ArrayList<Label>();
-    private ImageButton imageButton;
-    private ImageButton imageButton2;
-    private ImageButton imageButton3;
-    private ImageButton imageButton4;
-    private Image player1ScoreTagImage;
-    private Image player2ScoreTagImage;
-    private Label player1ScoreLabel;
-    private Label player2ScoreLabel;
-    private Player player1;
-    private Player player2;
-    private Label currentPlayerScoreLabel;
-    
-    public static Label errorNameTooLongLabel;
-    
-    //EndGameScreen
     private Image winnerBanner;
     private ImageButton replayButton;
     private Texture replayButtonTexture;
@@ -90,25 +54,17 @@ public class OtherAssets {
     private Label player2QsANDAsLabel;
     private Music endGameCheer;
     private Skin skinUI3;
+    private ImageButton imageButton;
+    private Label player1ScoreLabel;
+    private Label player2ScoreLabel;
+    private Player player1;
+    private Player player2;
+    private Label currentPlayerScoreLabel;
+    public static Label errorNameTooLongLabel;
     
-    // Constructor for MainMenuScreen & CategoryPickerScreen
+    // Constructor for MainMenuScreen
     public OtherAssets(Stage stage) {
         this.stage = stage;
-    }
-    
-    // Constructor for GameScreen
-    public OtherAssets(Stage stage, Player player1, Player player2, Image player1NameTagImage, Image player2NameTagImage, Image player1CategoryTagImage, Image player2CategoryTagImage, Label player1NameLabel, Label player2NameLabel, Label player1CategoryLabel, Label player2CategoryLabel) {
-        //this.stage = stage;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.player1NameTagImage = player1NameTagImage;
-        this.player2NameTagImage = player2NameTagImage;
-        this.player1CategoryTagImage = player1CategoryTagImage;
-        this.player2CategoryTagImage = player2CategoryTagImage;
-        this.player1NameLabel = player1NameLabel;
-        this.player2NameLabel = player2NameLabel;
-        this.player1CategoryLabel = player1CategoryLabel;
-        this.player2CategoryLabel = player2CategoryLabel;
     }
     
     // Constructor for EndGameScreen 
@@ -324,29 +280,35 @@ public class OtherAssets {
         }
     }
     
-    public String adjustLabelWidth(String text, int lengthCap) {
-        
+    private String adjustLabelWidth(String text, int lengthCap) {
+        int lastIDXofSpace = -1;
         StringBuilder stringbuilder = new StringBuilder();
         
-        while (text.length() > lengthCap) {
-            String currentSubString = text.substring(0, lengthCap + 1); // substring == "Hi my name "
+        while (text.length() > lengthCap) { // While its too big
+            String currentSubString = text.substring(0, lengthCap); // Create a substring up to where its legal
 
-            int lastIDXofSpace = currentSubString.lastIndexOf(" ");
+            // Get where the index of space meaning where we want to cut it off because spaces are safe to cut off
+            lastIDXofSpace = currentSubString.lastIndexOf(" "); 
 
-            currentSubString = currentSubString.substring(0, lastIDXofSpace) + "\n";
-
+            if (lastIDXofSpace == -1) {
+                lastIDXofSpace = currentSubString.length() -1;
+            }
+            
+            // Create a new subtring from the substring up to that space and add a new line
+            currentSubString = currentSubString.substring(0, lastIDXofSpace) + "\n"; 
+                
             stringbuilder.append(currentSubString);
 
             text = text.substring(lastIDXofSpace + 1);
 
-            if (text.length() < lengthCap ) {
+            if (text.length() < lengthCap ) { // If its less then we know were about to break out of loop so the rest gets appended
                 stringbuilder.append(text);
             }
         }
         
-        text = "\n" +  "\n" + stringbuilder.toString();
+        text = stringbuilder.toString();
            
-        return text;
+        return text; // Return fixed text
     }
     
     public ImageButton getReplayButton() {

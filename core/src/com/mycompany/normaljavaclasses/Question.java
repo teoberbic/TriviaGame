@@ -10,6 +10,7 @@ import java.util.List;
  *
  * @author teoberbic
  */
+// Class to assign each API request question their own parameter
 public class Question {
     private String question;
     @SerializedName("correct_answer")

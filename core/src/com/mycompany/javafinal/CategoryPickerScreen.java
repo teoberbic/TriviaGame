@@ -11,27 +11,38 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mycompany.normaljavaclasses.Category;
 
 public class CategoryPickerScreen implements Screen{
+    
+    // Refrences to Classes
     private final Drop game;
-    public static final String TITLE = "Teo's Trivia Competition";
+    private Stage stage;
+    private CategoryPickerScreenAssets cpsa;
+    private CategoryPickerScreenHelper categoryPickerScreenHelper;
 
     // User Input & UI Text 
     private TextField nameFieldUI;
     private TextField nameFieldUI2;
 
-    // Player 1 Fields
+    // Bools
     private boolean player1EnteredName;
     private boolean player1SpunWheel = false;
     private boolean player1GotCategoryBool = false;
-
-    // Player 2 Fields
     private boolean player2EnteredName = false;
     private boolean player2SpunWheel = false;
     private boolean player2GotCategoryBool = false;
+    private boolean player1WheelTimeHappendBefore = false;
+    private boolean player2WheelTimeStarted = false;
+    private boolean player1WheelTimeStarted = false;
+    private boolean countDownTimerCanStart = false;
+    private boolean doOnlyOnce = false;
+    private boolean coinShowTime = false;
+    private boolean coinWasFlipped = false;
+    private boolean disableCoin = false;
 
     // Wheel
     private Image wheel;
@@ -40,41 +51,29 @@ public class CategoryPickerScreen implements Screen{
     // Timer Vars 
     private float player2WheelTime = 3;
     private float player1WheelTime = 3;
-    private boolean player1WheelTimeHappendBefore = false;
-    private boolean player2WheelTimeStarted = false;
-    private boolean player1WheelTimeStarted = false;
-    private boolean countDownTimerCanStart = false;
+    
     private Sound clockTickingSFX;
-    boolean doOnlyOnce = false;
-    private boolean coinShowTime = false;
-    private boolean coinWasFlipped = false;
-    private boolean disableCoin = false;
-    
-    
-    private Stage stage;
-    private CategoryPickerScreenAssets cpsa;
-    
-    
-    private CategoryPickerScreenHelper categoryPickerScreenHelper;
+    private Label errorSameNameLabel;
     
     // Constructor
     public CategoryPickerScreen (Drop game) {
         this.game = game;
-        cpsa = CategoryPickerScreenAssets.getInstance();
+        cpsa = CategoryPickerScreenAssets.getInstance(); // Singleton
     }
 
     @Override
     public void show() { // Initializes everything when this screen is shown, used as the consructor of LibGDX
-        cpsa.loadAssets(); // All assets are in a new class for encapsualtion then call load method to load
+        cpsa.loadAssets(); // All assets are in a other class for encapsualtion then call load method to load
         stage = CategoryPickerScreenAssets.stage;
         
-        categoryPickerScreenHelper = CategoryPickerScreenHelper.makeCategoryPickerScreenHelper(cpsa,this);
+        categoryPickerScreenHelper = CategoryPickerScreenHelper.makeCategoryPickerScreenHelper(cpsa,this); // Pass in assets into helper class
 
         // Still need some assets present in this window because I need a references when changes will be made to them
         wheel = CategoryPickerScreenAssets.wheel;
         nameFieldUI = CategoryPickerScreenAssets.nameFieldUI;
         nameFieldUI2 = CategoryPickerScreenAssets.nameFieldUI2;
         clockTickingSFX = CategoryPickerScreenAssets.clockTickingSFX;
+        errorSameNameLabel = CategoryPickerScreenAssets.errorSameNameLabel;
         
         // Set stage as the Input Processor
         Gdx.input.setInputProcessor(stage);
@@ -85,21 +84,24 @@ public class CategoryPickerScreen implements Screen{
             @Override
             public boolean keyDown(InputEvent e, int key) {
                 
-                if(key == Keys.R & !coinShowTime & !disableCoin) {
+                if(key == Keys.R & !coinShowTime & !disableCoin) { // Press R Key to Reveal Coin
                     coinShowTime = categoryPickerScreenHelper.choosePlayer1();
                 }
                 
-                if(key == Keys.ENTER & !player1EnteredName & coinWasFlipped) {
+                if(key == Keys.ENTER & !player1EnteredName & coinWasFlipped) { // Press Enter to Establish Player 1 Name
+                    // Show error message to enter something
                     if(nameFieldUI.getText().length() == 0) {
-                        //show error message to enter something
                        categoryPickerScreenHelper.enterAndNoPlayerName();
-                        return true;
+                       errorSameNameLabel.setVisible(false);
+                       return true;
                         
+                    // Show error message name is too long
                     } else if(nameFieldUI.getText().length() > 6) {
-                        //show error message name is too long
                         categoryPickerScreenHelper.enterAndPlayerNameLong();
+                        errorSameNameLabel.setVisible(false);
                         return true;
     
+                    // No error all good
                     } else {
                         categoryPickerScreenHelper.enterAndPlayer1EnteredName();
                         player1EnteredName = true;
@@ -107,20 +109,23 @@ public class CategoryPickerScreen implements Screen{
                     }
                 }
                         
-                if(key == Keys.ENTER & player1EnteredName & !player2EnteredName & player1WheelTimeHappendBefore) {// PLAYER 2 ENTERED ENTER
+                if(key == Keys.ENTER & player1EnteredName & !player2EnteredName & player1WheelTimeHappendBefore) { // Press Enter to Establish Player 2 Name
+                    // Show error message to enter something
                     if(nameFieldUI2.getText() == "") {
                         categoryPickerScreenHelper.enterAndNoPlayerName();
+                        errorSameNameLabel.setVisible(false);
                         return true;
                     
+                    // Show error message name is too long
                     } else if(nameFieldUI2.getText().length() > 7) {
                         categoryPickerScreenHelper.enterAndPlayerNameLong();
+                        errorSameNameLabel.setVisible(false);
                         return true;
-                        
+                    
+                    // No error all good
                     } else {
                         player2EnteredName = categoryPickerScreenHelper.enterAndPlayer2EnteredName();
-                        //player2EnteredName = true;
                         return true;
-                        
                     }
                 }
             
@@ -128,26 +133,21 @@ public class CategoryPickerScreen implements Screen{
                 ///////////////////
                 //Space Key Below//
 
-                if(key == Keys.SPACE & player1EnteredName & !player1GotCategoryBool & !player2GotCategoryBool & !player1SpunWheel) { // SPACE PRESSED AND PLAYER 1 ENTERED NAME
+                if(key == Keys.SPACE & player1EnteredName & !player1GotCategoryBool & !player2GotCategoryBool & !player1SpunWheel) { // Press Space for Player 1 Wheel Spin
                       categoryPickerScreenHelper.spacePressedAndPlayer1EnteredName();
-
                       spinWheel();
                       player1SpunWheel = true;
-                      return true; // means the event has been handled by this listener and doesnt have to keep going down the chain of listeners
+                      return true; // Means the event has been handled by this listener and doesnt have to keep going down the chain of listeners
                 }
 
-                else if (key == Keys.SPACE & player2EnteredName & !player2GotCategoryBool & !player2SpunWheel) { // SPACE PRESSED AND PLAYER 2 ENTERED NAME
+                else if (key == Keys.SPACE & player2EnteredName & !player2GotCategoryBool & !player2SpunWheel) { // Press Space for Player 2 Wheel Spin
                     categoryPickerScreenHelper.spacePressedAndPlayer2EnteredName();
-                    
                     spinWheel();
                     player2SpunWheel = true;
-                    return true; // means the event has been handled by this listener and doesnt have to keep going down the chain of listeners
+                    return true; 
                 }
-                
             return false;
-            
             }
-            
         });
     }
              
@@ -170,30 +170,26 @@ public class CategoryPickerScreen implements Screen{
             public void run() {
 
                 finalRotation = wheel.getRotation();
-                System.out.println("FINAL ROTATION: " + finalRotation);
 
                 // Handle category selection after the wheel stops spinning
                 Category selectedCategory = categoryPickerScreenHelper.determineSelectedCategory(finalRotation);
 
                 if (player1SpunWheel & !player1GotCategoryBool) { // PLAYER 1 DOES NOT HAVE CATEGORY YET SO THIS SPIN IS TO BE ASSIGNED FOR PLAYER 1
-                    
                     categoryPickerScreenHelper.player1SpunWheel(selectedCategory);
                     player1SpunWheel = true;
                     player1GotCategoryBool = true;
-                    
                     player1WheelTimeStarted = true;
 
                 } else if (player2SpunWheel & !player2GotCategoryBool){ // IF PLAYER 1 ALREADY HAS CATEGORY THEN THIS SPIN IS TO BE ASSIGNED TO PLAYER 2
                     categoryPickerScreenHelper.player2SpunWheel(selectedCategory);
-
                     player2GotCategoryBool = true;
-
                     player2WheelTimeStarted = true;
                 }
             }
         })));
     }   
-
+    
+    // Fn to show Player 1 Wheel Time After spin
     public void player1WheelTime(float dt) {
         player1WheelTime = categoryPickerScreenHelper.player1WheelTime(dt);
         if(player1WheelTime < 0) {
@@ -201,6 +197,7 @@ public class CategoryPickerScreen implements Screen{
         }
     }
     
+    // Fn to show Player 1 Wheel Time After spin
     public void player2WheelTime(float dt) {
          player2WheelTime = categoryPickerScreenHelper.player2WheelTime(dt);
             if(player2WheelTime < 0 & !doOnlyOnce) {
@@ -208,29 +205,12 @@ public class CategoryPickerScreen implements Screen{
                 doOnlyOnce = true;
             }
     }
-
-    @Override
-    public void resize(int width, int height) {}
-
-    @Override
-    public void hide() {}
-
-    @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
-
-    @Override
-    public void dispose () {
-        stage.dispose();
-        clockTickingSFX.dispose();
-    }
-
+    
     private void update() {
         ScreenUtils.clear(0, 0, 0, 0);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 
+        // Timer to show Coin Flip Result
         if(coinShowTime) {
             coinShowTime = categoryPickerScreenHelper.coinTime(Gdx.graphics.getDeltaTime());
             if(!coinShowTime) {
@@ -255,4 +235,24 @@ public class CategoryPickerScreen implements Screen{
             categoryPickerScreenHelper.startCountdownTimer(Gdx.graphics.getDeltaTime(), game);
         }
     }
+
+    @Override
+    public void resize(int width, int height) {}
+
+    @Override
+    public void hide() {}
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void dispose () {
+        stage.dispose();
+        clockTickingSFX.dispose();
+    }
+
+    
 }

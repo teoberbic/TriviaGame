@@ -23,58 +23,49 @@ import java.util.List;
  * @author teoberbic
  */
 public class CategoryPickerScreenHelper {
-    //private final Assets assets;
     private final Sound enterErrorSFX;
     private final Label errorEnterNameLabel;
     private float player1WheelTime = 3;
-    
     private final Image wheel;
-    private TextField nameFieldUI2;
-    private Label nameLabelUI2;
-    private Label nameLabelNote;
+    private final TextField nameFieldUI2;
+    private final Label nameLabelUI2;
+    private final Label nameLabelNote;
     private float player2WheelTime = 3;
     private final Sound clockTickingSFX;
-    boolean doOnlyOnce = false;
-    
-    // User Input
+    private boolean doOnlyOnce = false;
     private final Sound enterSFX;
-    private Label nameLabelUI;
+    private final Label nameLabelUI;
     private final Image player1NameTagImage;
     private final Image player1IconImage;
-    private Label player2NameLabel;
+    private final Label player2NameLabel;
     private final Image player2NameTagImage;
     private final Image player2IconImage;
-    
-    //Spin Wheel
     private float finalRotation;
-    private Sound wheelSpinSFX;
+    private final Sound wheelSpinSFX;
     private long wheelSpinSFXId;
-    private Sound categoryAppearSFX;
+    private final Sound categoryAppearSFX;
     public Player player1;
-    private TextField nameFieldUI;
+    private final TextField nameFieldUI;
     private List<Question> player1Questions;
-    private Label player1NameLabel;
-    private Label player1CategoryLabel;
+    private final Label player1NameLabel;
+    private final Label player1CategoryLabel;
     private final Image player1CategoryTagImage;
     private final Image categoryIcon1;
     private long wheelSpinSFXId2;
     public Player player2;
-    private Label player2CategoryLabel;
+    private final Label player2CategoryLabel;
     private final Image player2CategoryTagImage;
     private final Image categoryIcon2;
-    
-    //CountdownTimer
-    private Label timerLabel;
+    private final Label timerLabel;
     private float countdownTime = 10;
     private List<Question> player2Questions;
     private final CategoryPickerScreen categoryPickerScreen;
     private final Label spaceLabel;
-    
-    boolean executed = false;
+    private boolean executed = false;
     private final Label choosePlayer1Label;
     private final Label revealPlayer1Label;
     private float coinTimer = 3;
-    private Label errorSameNameLabel;
+    private final Label errorSameNameLabel;
     private final CategoryPickerScreenAssets cpsa;
 
 
@@ -82,11 +73,9 @@ public class CategoryPickerScreenHelper {
     private CategoryPickerScreenHelper(CategoryPickerScreenAssets cpsa, CategoryPickerScreen categoryPickerScreen) {
         this.categoryPickerScreen = categoryPickerScreen;
         this.cpsa = cpsa;
-               
         this.errorEnterNameLabel = CategoryPickerScreenAssets.errorEnterNameLabel;
         this.enterErrorSFX = CategoryPickerScreenAssets.enterErrorSFX;
         this.clockTickingSFX = CategoryPickerScreenAssets.clockTickingSFX;
-        
         this.wheel = CategoryPickerScreenAssets.wheel;
         this.nameFieldUI2 = CategoryPickerScreenAssets.nameFieldUI2;
         this.nameLabelUI2 = CategoryPickerScreenAssets.nameLabelUI2;
@@ -95,8 +84,6 @@ public class CategoryPickerScreenHelper {
         this.player2NameLabel = CategoryPickerScreenAssets.player2NameLabel;
         this.player2NameTagImage = CategoryPickerScreenAssets.player2NameTagImage;
         this.player2IconImage = CategoryPickerScreenAssets.player2IconImage;
-        
-        // Spin Wheel
         this.wheelSpinSFX = CategoryPickerScreenAssets.wheelSpinSFX;
         this.categoryAppearSFX = CategoryPickerScreenAssets.categoryAppearSFX;
         this.nameFieldUI = CategoryPickerScreenAssets.nameFieldUI;
@@ -110,14 +97,10 @@ public class CategoryPickerScreenHelper {
         this.enterSFX = CategoryPickerScreenAssets.enterSFX;
         this.nameLabelUI = CategoryPickerScreenAssets.nameLabelUI;
         this.player1NameTagImage = CategoryPickerScreenAssets.player1NameTagImage;
-        
-        //CountdownTimer
-        timerLabel = CategoryPickerScreenAssets.timerLabel;
+        this.timerLabel = CategoryPickerScreenAssets.timerLabel;
         this.spaceLabel = CategoryPickerScreenAssets.spaceLabel;
-        
-        choosePlayer1Label = CategoryPickerScreenAssets.choosePlayer1Label;
-        revealPlayer1Label = CategoryPickerScreenAssets.revealPlayer1Label;
-        
+        this.choosePlayer1Label = CategoryPickerScreenAssets.choosePlayer1Label;
+        this.revealPlayer1Label = CategoryPickerScreenAssets.revealPlayer1Label;
         this.errorSameNameLabel = CategoryPickerScreenAssets.errorSameNameLabel;
     }
     
@@ -151,16 +134,12 @@ public class CategoryPickerScreenHelper {
         spaceLabel.setVisible(true);
         player1NameLabel.setText(player1NameLabel.getText() + nameFieldUI.getText()); // Update player1Name with the latest text from the TextField
         Gdx.input.setOnscreenKeyboardVisible(false); // Hide virtual keyboard 
-        
-        // PLAYER 1 TEXT FIELDS ARE HIDDEN
         nameFieldUI.setVisible(false);
         nameLabelUI.setVisible(false);
-        
         player1NameTagImage.setVisible(true);
         player1NameLabel.setVisible(true); 
         player1IconImage.setVisible(true);
         nameFieldUI.setDisabled(true);
-
     }
     
     public boolean enterAndPlayer2EnteredName() {
@@ -181,16 +160,13 @@ public class CategoryPickerScreenHelper {
             spaceLabel.setVisible(true);
             player2NameLabel.setText(player2NameLabel.getText() + nameFieldUI2.getText());
             Gdx.input.setOnscreenKeyboardVisible(false);
-
-            // PLAYER 2 TEXT FIELDS ARE HIDDEN
             nameFieldUI2.setVisible(false);
             nameLabelUI2.setVisible(false);
-
             player2NameTagImage.setVisible(true);
             player2NameLabel.setVisible(true);
             player2IconImage.setVisible(true);
             nameFieldUI2.setDisabled(true);
-            return true;
+            return true; // Return true indicating everything is done
         }
     }
     
@@ -217,7 +193,6 @@ public class CategoryPickerScreenHelper {
             nameFieldUI2.setVisible(true);
             nameLabelNote.setVisible(true);
         }
-        
         return player1WheelTime;
     }
     
@@ -246,15 +221,12 @@ public class CategoryPickerScreenHelper {
         });
         th.start();
        
-        System.out.println("Player 1" + player1.getName() + "Selected Category: " + player1.getCategory());
         player1NameLabel.setVisible(true);
         player1CategoryLabel.setText("Player 1 Category: \n" + player1.getCategory());
         player1CategoryTagImage.setVisible(true);
         player1CategoryLabel.setVisible(true);
         categoryIcon1.setVisible(true);
-
         Gdx.input.setOnscreenKeyboardVisible(true);
-
     }
     
     public void player2SpunWheel(Category selectedCategory) {
@@ -263,11 +235,7 @@ public class CategoryPickerScreenHelper {
         
         // Use of Static Factory
         player2 = Player.makePlayer(nameFieldUI2.getText(), 0, selectedCategory);
-        //new Player(nameFieldUI2.getText(), 0, selectedCategory);
-                
         player2CategoryLabel.setText("Player 2 Category: \n" + player2.getCategory());
-        System.out.println("Player 2 Selected Category: " + player2.getCategory());
-
         player2CategoryTagImage.setVisible(true);
         player2CategoryLabel.setVisible(true);
         categoryIcon2.setVisible(true);
@@ -277,15 +245,15 @@ public class CategoryPickerScreenHelper {
         timerLabel.setVisible(true);
             countdownTime -= dt;
             timerLabel.setText("Countdown Until Game Start: " + (int) countdownTime);
-            // Put this condition check here for API request purposes because api requires a certain amt of time between requests
+            // Put this condition check here for API request purposes because API requires a certain amt of time between requests
             
-            if(countdownTime <= 3 & !executed) {
+            if(countdownTime <= 5 & !executed) {
                 executed = true;
                 Thread th = new Thread(() -> {
                     player2Questions = APIRequestHandler.makeRequest("10", player2.getCategory().getCategoryNumber(), "easy");
                 });
                 th.start();
-                // API request will take less than 2 seconds to be called
+                // API request will take less than 5 seconds to be called
             }
             
             if(countdownTime <= 0) {

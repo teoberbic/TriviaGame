@@ -19,42 +19,43 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import static com.mycompany.javafinal.Drop.HEIGHT;
 import static com.mycompany.javafinal.Drop.WIDTH;
 
-
-
 /**
  *
  * @author teoberbic
  */
 public class MainMenuScreen implements Screen{
+    
+    public static final String TITLE = "Teo's Trivia Competition";
+    
+    // References to Classes
     private final Drop game;
-    private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // where the view of the stage is;;;
+    private Stage stage = new Stage(new FitViewport(WIDTH, HEIGHT)); // Where the view of the stage is
+    OtherAssets assets;
+    
+    // Assets
     private Music backgroundMusic;
     private ImageButton imageButton;
-
-    OtherAssets assets;
+    
     
     public MainMenuScreen(final Drop game) {
         this.game = game;
     }
     @Override
     public void show() {
-        
-        // All assets are in a new class for encapsualtion then call the loadCategoryPickerScreen method so they get loaded
-        assets = new OtherAssets(stage);
-        assets.loadMainMenuScreen();
-        backgroundMusic = assets.getBackgroundMusic();
+        assets = new OtherAssets(stage); // All assets are in a new class for encapsualtion
+        assets.loadMainMenuScreen(); // Call the loadCategoryPickerScreen method so they get loaded
+        backgroundMusic = assets.getBackgroundMusic(); // Call back assets you need still
         backgroundMusic.play();
         imageButton = assets.getImageButton();
 
-        Gdx.input.setInputProcessor(stage); // set the stage for input to be processed through
+        Gdx.input.setInputProcessor(stage); // Set the stage for input to be processed through
         
         // Button Clicked Handler (has to be in show method)
         imageButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-
-                game.setScreen(new CategoryPickerScreen(game)); // Once clicked change screen to  CategoryPickerScreen to advance game
-                dispose();
+                game.setScreen(new CategoryPickerScreen(game)); // Once clicked change screen to CategoryPickerScreen to advance game
+                dispose(); // Dispose all assets for memory freeing
             }
         });
     }
@@ -63,7 +64,6 @@ public class MainMenuScreen implements Screen{
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 0);
-
         stage.act();
         stage.draw();
     }
@@ -85,5 +85,4 @@ public class MainMenuScreen implements Screen{
         backgroundMusic.dispose();
         stage.dispose();
     }
-
 }

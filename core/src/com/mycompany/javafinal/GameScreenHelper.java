@@ -20,12 +20,11 @@ import org.apache.commons.text.StringEscapeUtils;
  * @author teoberbic
  */
 public class GameScreenHelper {
-
+    
     private final GameScreen gameScreen;
     private final GameScreenAssets gsa;
     private Stage stage;
-    
-    private Sound correctAnswerSFX;
+    private final Sound correctAnswerSFX;
     private Player currentPlayer;
     private Label currentPlayerScoreLabel;
     private Player player1;
@@ -47,17 +46,16 @@ public class GameScreenHelper {
     private float endQTimer = 3;
     
     public GameScreenHelper (GameScreenAssets gsa, GameScreen gameScreen, Player player1, Player player2, List<Question> player1Questions, List<Question> player2Questions) {
+        // Assign all vars passed in
         this.gsa = gsa;
         this.gameScreen = gameScreen;
         this.stage = GameScreenAssets.stage;
-        
         this.correctAnswerSFX = GameScreenAssets.correctAnswerSFX;
         this.player1 = player1;
         this.player2 = player2;
         this.player1Questions = player1Questions;
         this.player2Questions = player2Questions;
-        currentPlayer = player1;
-        
+        this.currentPlayer = player1;
         this.currentPlayerScoreLabel = GameScreenAssets.currentPlayerScoreLabel;
         this.player1GainedPointLabel = GameScreenAssets.player1GainedPointLabel;
         this.player2GainedPointLabel = GameScreenAssets.player2GainedPointLabel;
@@ -76,7 +74,6 @@ public class GameScreenHelper {
         correctAnswerSFX.play(1.0f);
         currentPlayer.updateScore();
         currentPlayerScoreLabel.setText("Player Score: " + currentPlayer.getScore());
-        System.out.println(currentPlayer.getScore());
 
         if (currentPlayer == player1) {
             player1GainedPointLabel.setVisible(true);
@@ -144,26 +141,19 @@ public class GameScreenHelper {
         // Get all answers and shuffle their order
         List<String> answers = questions.get(playerCurrentQuestionIndex).getIncorrectAnswers();
         currentCorrectAnswer = StringEscapeUtils.unescapeHtml4(questions.get(playerCurrentQuestionIndex).getCorrectAnswer());
-        answers.add(questions.get(playerCurrentQuestionIndex).getCorrectAnswer());
+        answers.add(currentCorrectAnswer);
         Collections.shuffle(answers);
         
         // Sets an answer on each label
         for (int i = 0; i <= 3; i++) {
-            System.out.println("Multiple Choice: " + i + "==" + answers.get(i));
             String currentAnswer = StringEscapeUtils.unescapeHtml4(answers.get(i));
             
-            // For debugging
-            if (currentAnswer.length() > 80) {
-                System.out.println("ANSWER LONG");
+            if (currentAnswer.length() > 23) { 
+                currentAnswer = this.adjustLabelWidth(currentAnswer, 23); // Pass it to get fixed if too long
             }
-            if (currentAnswer.length() > 23) {
-                currentAnswer = this.adjustLabelWidth(currentAnswer, 23);
-            }
-            
             answerLabels.get(i).setText(StringEscapeUtils.unescapeHtml4(currentAnswer));
         }
         
-        System.out.println("CORRECT ANSWER:" + currentCorrectAnswer);
         return currentCorrectAnswer;
     }
 
@@ -171,29 +161,30 @@ public class GameScreenHelper {
         int lastIDXofSpace = -1;
         StringBuilder stringbuilder = new StringBuilder();
         
-        while (text.length() > lengthCap) {
-            String currentSubString = text.substring(0, lengthCap); // substring == "Hi my name "
+        while (text.length() > lengthCap) { // While its too big
+            String currentSubString = text.substring(0, lengthCap); // Create a substring up to where its legal
 
-            lastIDXofSpace = currentSubString.lastIndexOf(" ");
-            System.out.println("LAST INDEX OF SPACE:" + lastIDXofSpace);
+            // Get where the index of space meaning where we want to cut it off because spaces are safe to cut off
+            lastIDXofSpace = currentSubString.lastIndexOf(" "); 
 
             if (lastIDXofSpace == -1) {
                 lastIDXofSpace = currentSubString.length() -1;
             }
-            currentSubString = currentSubString.substring(0, lastIDXofSpace) + "\n"; // code breaks here sometimes, caught it at length 36 & and 35
+            
+            // Create a new subtring from the substring up to that space and add a new line
+            currentSubString = currentSubString.substring(0, lastIDXofSpace) + "\n"; 
                 
-
             stringbuilder.append(currentSubString);
 
             text = text.substring(lastIDXofSpace + 1);
 
-            if (text.length() < lengthCap ) {
+            if (text.length() < lengthCap ) { // If its less then we know were about to break out of loop so the rest gets appended
                 stringbuilder.append(text);
             }
         }
         
         text = stringbuilder.toString();
            
-        return text;
+        return text; // Return fixed text
     }
 }

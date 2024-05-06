@@ -8,6 +8,7 @@ package com.mycompany.normaljavaclasses;
  *
  * @author teoberbic
  */
+// Enum class with value based on API request value needed
 public enum Category {
     GENERAL_KNOWLEDGE ("9"), 
     FILM ("11"), 

@@ -23,17 +23,14 @@ import com.mycompany.normaljavaclasses.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 /**
  *
  * @author teoberbic
  */
 public class GameScreenAssets {
-    // Fields
+    
     private static GameScreenAssets gsa = null;
     public static Stage stage;
-    
     public static Image player1NameTagImage;
     public static Image player2NameTagImage;
     public static Image player1CategoryTagImage;
@@ -62,7 +59,6 @@ public class GameScreenAssets {
     public static Image scoreIcon2;
     public static Label errorEnterNameLabel;
     public static Sound correctAnswerSFX;
-    
     public static Label errorNameTooLongLabel;
     public static Sound incorrectAnswerSFX;
     public static Sound wheelSpinSFX;
@@ -71,8 +67,6 @@ public class GameScreenAssets {
     public static Sound categoryAppearSFX;
     public static Sound clockTickingSFX;
     public static Label nameLabelNote;
-    
-    
     public static Skin skinUI;
     public static Skin skinUI2;
     public static Label timerLabel;
@@ -88,16 +82,15 @@ public class GameScreenAssets {
     public static Label player1TurnLabel;
     public static Label player2TurnLabel;
     public static Label playerCurrentIndexLabel;
-    // Constructor
-    private GameScreenAssets() {
-        
-    }
+    
+    private GameScreenAssets() {}
     
     // Only one instance
     public static GameScreenAssets getInstance(Player player1, Player player2, Label player1NameLabel, Label player2NameLabel, Label player1CategoryLabel, Label player2CategoryLabel){
         if (gsa == null) {
             gsa = new GameScreenAssets();
         }
+        // Load in vars to assign from CategoryPickerScreen
         GameScreenAssets.player1 = player1;
         GameScreenAssets.player2 = player2;
         GameScreenAssets.player1NameLabel = player1NameLabel;
@@ -285,7 +278,6 @@ public class GameScreenAssets {
     
     // Fn for Game Screen
     public ImageButton createImageButtonQuestion(String num, int x, int y) {
-        
         Texture answerBtnTexture = new Texture(Gdx.files.internal("btnImage" + num + ".png"));
         Texture answerBtnTextureHover = new Texture(Gdx.files.internal("btnImage" + num + "Hover.png"));
         ImageButton.ImageButtonStyle buttonStyle = new ImageButton.ImageButtonStyle();
@@ -294,7 +286,6 @@ public class GameScreenAssets {
         ImageButton imageButton = new ImageButton(buttonStyle);
         imageButton.setPosition(x,y); // Set position of the button
         stage.addActor(imageButton);
-        
         return imageButton;
     }
 }
